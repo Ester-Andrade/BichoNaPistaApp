@@ -66,22 +66,48 @@ const styles = StyleSheet.create({
   latestRecordsText: {
     alignSelf: 'flex-start',
     fontSize: 10 * scale,
-    color: colors.gray2,
+    color: colors.darkGray2,
     marginLeft: '10%',
     marginBottom: '2.6%',
   },
   latestRecordsItem: {
     backgroundColor: colors.ligthGray,
-    justifyContent: 'center',
+    flexDirection: 'row',
     alignItems: 'center',
     marginHorizontal: 7.5,
-    width: Dimensions.get('screen').width * 0.8,
+    paddingHorizontal: Dimensions.get('screen').width * 0.032,
+    width: Dimensions.get('screen').width * 0.80,
     height: '88%',
     borderRadius: 15,
     borderWidth: 1,
     borderColor: '#DDDDDD',
     elevation: 2,
   },
+  photo: {
+    width: Dimensions.get('screen').width * 0.27,
+    height: Dimensions.get('screen').width * 0.27,
+    borderWidth: 2,
+    borderRadius: 6,
+    borderColor: 	colors.gray3,
+    opacity: 0.45,
+    // elevation: 2,
+  },
+  info: {
+    flex: 1,
+    marginLeft: Dimensions.get('screen').width * 0.02,
+  },
+  title: {
+    fontSize: 15 * scale,
+    color: colors.gray3,
+  },
+  text: {
+    fontSize: 13 * scale,
+    color: colors.gray3,
+  },
+  line: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  }
 })
 
 export default styles

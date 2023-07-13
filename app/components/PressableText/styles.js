@@ -30,6 +30,28 @@ const styles = StyleSheet.create({
   text_shrinker: {
     color: colors.gray,
   },
+  image_editar: {
+    alignSelf: 'center',
+    marginRight: 2,
+    marginTop: 1 * scale,
+    width: 14 * scale,
+    height: 11 * scale,
+  },
+  text_editar: {
+    textDecorationLine: 'underline',
+    color: colors.gray3,
+  },
+  image_editar2: {
+    alignSelf: 'center',
+    marginRight: 4,
+    marginTop: 4 * scale,
+    width: 14 * scale,
+    height: 13 * scale,
+  },
+  text_editar2: {
+    textDecorationLine: 'underline',
+    color: colors.gray3,
+  },
 })
 
 export default styles

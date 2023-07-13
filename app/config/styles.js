@@ -6,6 +6,8 @@ const colors = {
   darkGray2: '#262626', // seta de voltar
   gray: '#858585', // texto dos campos
   gray2: '#666666',
+  gray3: '#333333',
+  gray4: '#BFBFBF',
   ligthGray: '#EDEDED', //Tela sobreposta de cadastro
   red: '#EA0000',
   white: '#FFFFFF',

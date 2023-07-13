@@ -17,6 +17,14 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1.5,
     borderBottomColor: colors.gray,
   },
+  label: {
+    position: 'absolute',
+    alignSelf: 'flex-start',
+    marginTop: Dimensions.get('screen').height * 0.013,
+    marginLeft: 5,
+    fontSize: 11 * scale,
+    color: colors.gray,
+  },
   text: {
     color: colors.gray,
     fontSize: 14 * scale,

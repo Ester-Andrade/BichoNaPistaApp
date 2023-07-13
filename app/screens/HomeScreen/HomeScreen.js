@@ -1,9 +1,18 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { View, Text, Image, TouchableOpacity, Dimensions, Alert } from 'react-native'
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Dimensions,
+  Alert,
+} from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import {
   useFonts,
   SourceSansPro_300Light,
+  SourceSansPro_700Bold_Italic,
+  SourceSansPro_400Regular_Italic,
 } from '@expo-google-fonts/source-sans-pro'
 import { NetworkConsumer } from 'react-native-offline'
 import * as Location from 'expo-location'
@@ -71,6 +80,7 @@ const HomeScreen = ({ navigation }) => {
     '#99FF99',
     '#B34D4D',
   ]
+  
   const translateY = useSharedValue(0)
 
   const scrollTo = useCallback((destination) => {
@@ -104,6 +114,8 @@ const HomeScreen = ({ navigation }) => {
 
   let [fontsLoaded] = useFonts({
     SourceSansPro_300Light,
+    SourceSansPro_700Bold_Italic,
+    SourceSansPro_400Regular_Italic,
   })
 
   if (!fontsLoaded) {
@@ -127,7 +139,7 @@ const HomeScreen = ({ navigation }) => {
               <Text
                 style={[
                   styles.latestRecordsText,
-                  { fontfamily: SourceSansPro_300Light },
+                  { fontFamily: 'SourceSansPro_300Light' },
                 ]}
               >
                 ULTIMOS REGISTROS
@@ -137,7 +149,7 @@ const HomeScreen = ({ navigation }) => {
                 keyExtractor={(item) => String(item)}
                 showsHorizontalScrollIndicator={false}
                 snapToOffsets={[...Array(data.length)].map(
-                  (x, i) => i * (WIDTH * 0.8 - 15) + (i - 1) * 30
+                  (x, i) => i * (WIDTH * 0.80 - 15) + (i - 1) * 30
                 )}
                 horizontal
                 snapToAlignment={'start'}
@@ -145,10 +157,52 @@ const HomeScreen = ({ navigation }) => {
                 decelerationRate="fast"
                 renderItem={({ item }) => (
                   <View style={styles.latestRecordsItem}>
-                    <Text style={{ fontSize: 14, backgroundColor: item }}>
-                      {' '}
-                      COLOR{' '}
-                    </Text>
+                    <View style={styles.photo}></View>
+                    <View style={styles.info}>
+                      <Text
+                        style={[styles.title, { fontFamily: 'SourceSansPro_700Bold_Italic' }]}
+                      >
+                        Capivara
+                      </Text>
+                      <Text
+                        numberOfLines={1}
+                        style={[ styles.text,
+                          { fontFamily: 'SourceSansPro_400Regular_Italic' },
+                        ]}
+                      >
+                        Hydrochoerus hydrochaeris
+                      </Text>
+                      <View style={styles.line}>
+                      <Text
+                        style={[styles.text,
+                          { fontFamily: 'SourceSansPro_400Regular_Italic' },
+                        ]}
+                      >
+                        05/08/2021
+                      </Text>
+                      <Text
+                        style={[styles.text,
+                          { fontFamily: 'SourceSansPro_400Regular_Italic' },
+                        ]}
+                      >
+                        10:30
+                      </Text>
+                      </View>
+                      <Text
+                        style={[styles.text,
+                          { fontFamily: 'SourceSansPro_400Regular_Italic' },
+                        ]}
+                      >
+                        Mamífero
+                      </Text>
+                      <Text
+                        style={[styles.text,
+                          { fontFamily: 'SourceSansPro_400Regular_Italic' },
+                        ]}
+                      >
+                        Vivo
+                      </Text>
+                    </View>
                   </View>
                 )}
               />

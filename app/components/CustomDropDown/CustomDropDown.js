@@ -13,6 +13,7 @@ import styles from './styles'
 const CustomDropDown = ({
   data,
   placeholder,
+  label = '',
   value,
   setValue,
   wShow,
@@ -44,14 +45,17 @@ const CustomDropDown = ({
           clicked ? touched() : null
         }}
       >
+        {(value !== null && label !== '') || placeholder === '' ? (
+          <Text
+            style={[styles.label, { fontFamily: 'SourceSansPro_400Regular' }]}
+          >
+            {label}
+          </Text>
+        ) : null}
         <Text style={[styles.text, { fontFamily: 'SourceSansPro_400Regular' }]}>
           {value === null
             ? placeholder
-            : data[
-                data
-                  .map((item) => item[wSave])
-                  .indexOf(value)
-              ][wShow]}
+            : data[data.map((item) => item[wSave]).indexOf(value)][wShow]}
         </Text>
         {clicked ? (
           <Image

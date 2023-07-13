@@ -1,5 +1,5 @@
 import { Dimensions } from 'react-native'
 
-const scale = Dimensions.get('screen').height / 840
+const scale = Dimensions.get('screen').height / 832
 
 export default scale

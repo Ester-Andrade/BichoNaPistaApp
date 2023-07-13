@@ -49,7 +49,7 @@ const CustomDrawerContent = (props) => {
               height: 66,
               width: 66,
               borderRadius: 1000,
-              backgroundColor: '#BFBFBF',
+              backgroundColor: colors.gray4,
             }}
           />
           <View style={{ flex: 1, marginLeft: 10 }}>
@@ -265,6 +265,7 @@ const DrawerNavigator = () => {
           headerTitleStyle: {
             fontFamily: 'Alata_400Regular',
           },
+          headerTitleAlign: 'center'
         }}
       />
     </Drawer.Navigator>

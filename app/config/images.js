@@ -15,6 +15,7 @@ const images = {
     addPhoto: require('../images/add-photo.png'),
     removeCircle: require('../images/remove-circle.png'),
     pinAdd: require('../images/pin-add-icon.png'),
+    clock: require('../images/clock.png'),
   },
 }
 
