@@ -1,35 +1,44 @@
 import React, { createContext, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useIsConnected } from 'react-native-offline'
 import PcIP from '../config/MyPcIp'
 
 export const MonitoringContext = createContext()
 
 export const MonitoringProvider = ({ children }) => {
-  const [isLoading, setIsLoading] = useState(false)
-  const [userToken, setUserToken] = useState(null)
-  const [userName, setUserName] = useState(null)
-  const [userType, setUserType] = useState(null)
+  const [monitoringQueue, setMonitoringQueue] = useState([])
 
-    const start = () => {
-    console.log("começu monitoramento")
+  const isConnected = useIsConnected()
+
+  const start = () => {
+    console.log('começu monitoramento')
   }
 
   const finalize = () => {
-    console.log("terminou monitoramento")
+    console.log('terminou monitoramento')
+  }
+
+  const sendAttempt = () => {
+    console.log('tentativa de envio')
+    if (isConnected) {
+      // send() envia os dados
+    } else {
+      // coloca na fila
+    }
   }
 
   const send = () => {
-    console.log("enviou monitoramento")
+    console.log('enviou monitoramento')
   }
 
   useEffect(() => {
-    console.log("contexto de monitoramento")
-  }, [])
+    if (isConnected) {
+      
+    }
+  }, [isConnected])
 
   return (
-    <MonitoringContext.Provider
-      value={{ start, finalize, send }}
-    >
+    <MonitoringContext.Provider value={{ start, finalize, sendAttempt }}>
       {children}
     </MonitoringContext.Provider>
   )

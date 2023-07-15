@@ -11,6 +11,7 @@ import { Formik } from 'formik'
 import * as Yup from 'yup'
 import { useIsConnected } from 'react-native-offline'
 import { AuthContext } from '../../context/Auth'
+import * as Location from 'expo-location'
 import CustomHeader from '../../components/CustomHeader'
 import CameraComponent from '../CameraView/CameraView'
 import PhotoComponent from '../../components/PhotoComponent'
@@ -129,13 +130,17 @@ const RegistrationScreen = ({ route }) => {
   const [openCamera, setOpenCamera] = useState(false)
   const [wPhoto, setWPhoto] = useState(null)
 
+  // ======================= Occurrence position ======================
+  const [initLatitude, setInitLatitude] = useState(null)
+  const [initLongitude, setInitLongitude] = useState(null)
+  const [initPlace, setInitPlace] = useState(null)
+
   const isConnected = useIsConnected()
 
   useEffect(() => {
-    if (gettingData) {
-      getData(
+    ;(async () => {
+      await getData(
         isConnected,
-        setGettingData,
         setGrupoTaxOp,
         setEspecieOp,
         setDestAnimalOp,
@@ -146,7 +151,29 @@ const RegistrationScreen = ({ route }) => {
         setVegetacaoOp,
         setEncontradoEmOp
       )
-    }
+
+      const {
+        coords: { latitude, longitude },
+      } = await Location.getCurrentPositionAsync()
+      setInitLatitude(latitude)
+      setInitLongitude(longitude)
+
+      const place = await Location.reverseGeocodeAsync({
+        latitude: latitude,
+        longitude: longitude,
+      })
+      setInitPlace(
+        place[0].street +
+          ' - ' +
+          place[0].district +
+          ', ' +
+          place[0].subregion +
+          ' - ' +
+          place[0].region
+      )
+
+      setGettingData(false)
+    })()
   }, [])
 
   const onAdvancedOpPressed = () => {
@@ -169,9 +196,9 @@ const RegistrationScreen = ({ route }) => {
             photo1: route.params.photo1,
             photo2: route.params.photo2,
             photo3: route.params.photo3,
-            local: route.params.local,
-            latitude: null,
-            longitude: null,
+            local: route.params.local === null ? initPlace : route.params.local,
+            latitude: initLatitude,
+            longitude: initLongitude,
             grupo_taxonomico: route.params.grupo_taxonomico,
             n_individuos: route.params.n_individuos,
             //Animal data
@@ -285,6 +312,7 @@ const RegistrationScreen = ({ route }) => {
                   <View style={styles.field}>
                     <CustomTextInput
                       placeholder="Local"
+                      label="Local"
                       value={values.local}
                       setValue={(value) => setFieldValue('local', value)}
                       editable={route.params.editable}
@@ -307,7 +335,30 @@ const RegistrationScreen = ({ route }) => {
                   </View>
                   <TouchableOpacity
                     activeOpacity={0.7}
-                    onPress={() => console.log('geo pressed')}
+                    onPress={() => {
+                      ;(async () => {
+                        const {
+                          coords: { latitude, longitude },
+                        } = await Location.getCurrentPositionAsync()
+                        setFieldValue('latitude', latitude)
+                        setFieldValue('longitude', longitude)
+
+                        const place = await Location.reverseGeocodeAsync({
+                          latitude: latitude,
+                          longitude: longitude,
+                        })
+                        setFieldValue(
+                          'local',
+                          place[0].street +
+                            ' - ' +
+                            place[0].district +
+                            ', ' +
+                            place[0].subregion +
+                            ' - ' +
+                            place[0].region
+                        )
+                      })()
+                    }}
                     disabled={!route.params.editable}
                     style={styles.geolocationBtn}
                   >

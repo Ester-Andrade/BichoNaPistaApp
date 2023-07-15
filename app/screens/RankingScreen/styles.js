@@ -8,10 +8,6 @@ const styles = StyleSheet.create({
     width: '100%',
     backgroundColor: colors.white,
   },
-  scrollRoot: {
-    flex: 1,
-    width: '100%',
-  },
   gradient: {
     alignItems: 'center',
     width: '100%',

@@ -87,7 +87,7 @@ const RankingScreen = () => {
       </LinearGradient>
       <ScrollView
         nestedScrollEnabled={true}
-        style={styles.scrollRoot}
+        style={styles.root}
         contentContainerStyle={{ alignItems: 'center', flexGrow: 1 }}
       >
         <Image source={images.miniLogo} style={styles.watermark} />

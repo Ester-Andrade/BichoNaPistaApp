@@ -50,7 +50,6 @@ const getDataFromIP = async () => {
 
 const getData = async (
   isConnected,
-  setGettingData,
   setGrupTaxOp,
   setEspecieOp,
   setDestAnimalOp,
@@ -89,7 +88,7 @@ const getData = async (
   } catch (e) {
     console.log('gettingData in error ', e)
   }
-  setGettingData(false)
+
   return;
 }
 
