@@ -9,7 +9,7 @@ import {
 import styles from './styles'
 import colors from '../../config/styles'
 
-const CustomAlert = ({ msg, onPress, showAlert, setShowAlert }) => {
+const CustomAlert = ({ msg, onPress = null, showAlert, setShowAlert }) => {
   let [fontsLoaded] = useFonts({
     SourceSansPro_700Bold,
     SourceSansPro_600SemiBold,
@@ -36,10 +36,13 @@ const CustomAlert = ({ msg, onPress, showAlert, setShowAlert }) => {
           </Text>
           <TouchableOpacity
             activeOpacity={0.7}
-            onPress={() => {
-              onPress
-              setShowAlert(false)
-            }}
+            onPress={
+              onPress === null
+                ? () => {
+                    setShowAlert(false)
+                  }
+                : onPress
+            }
             style={styles.btn}
           >
             <LinearGradient

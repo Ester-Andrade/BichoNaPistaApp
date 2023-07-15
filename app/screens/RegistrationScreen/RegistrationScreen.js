@@ -11,6 +11,7 @@ import { Formik } from 'formik'
 import * as Yup from 'yup'
 import { useIsConnected } from 'react-native-offline'
 import { AuthContext } from '../../context/Auth'
+import { RegistrationContext } from '../../context/Registration'
 import * as Location from 'expo-location'
 import CustomHeader from '../../components/CustomHeader'
 import CameraComponent from '../CameraView/CameraView'
@@ -23,6 +24,7 @@ import CustomCheckBox from '../../components/CustomCheckBox'
 import CustomTextArea from '../../components/CustomTextArea'
 import CustomButton from '../../components/CustomButton'
 import NoConnection from '../../components/NoConnection'
+import CustomAlert from '../../components/CustomAlert'
 import getData from './RegistrationScreenContainer'
 import images from '../../config/images'
 import colors from '../../config/styles'
@@ -91,8 +93,9 @@ const OccurrenceSchemaForCitizen = Yup.object().shape({
     .nullable(true),
 })
 
-const RegistrationScreen = ({ route }) => {
-  const { userType } = useContext(AuthContext)
+const RegistrationScreen = ({ navigation, route }) => {
+  const { userType, userToken } = useContext(AuthContext)
+  const { sendAttempt } = useContext(RegistrationContext)
 
   // ========================= form's data options =========================
   const [grupoTaxOp, setGrupoTaxOp] = useState([])
@@ -129,6 +132,8 @@ const RegistrationScreen = ({ route }) => {
   const [advancedOpIsOpen, setAdvancedOpIsOpen] = useState(userType === 1)
   const [openCamera, setOpenCamera] = useState(false)
   const [wPhoto, setWPhoto] = useState(null)
+  const [showAlert, setShowAlert] = useState(false)
+  const [alertMsg, setAlertMsg] = useState(true)
 
   // ======================= Occurrence position ======================
   const [initLatitude, setInitLatitude] = useState(null)
@@ -151,26 +156,38 @@ const RegistrationScreen = ({ route }) => {
         setVegetacaoOp,
         setEncontradoEmOp
       )
+      console.warn('alou')
+      try {
+        const {
+          coords: { latitude, longitude },
+        } = await Location.getCurrentPositionAsync({
+          enableHighAccuracy: true,
+        })
+        console.warn('alou2')
+        setInitLatitude(latitude)
+        setInitLongitude(longitude)
 
-      const {
-        coords: { latitude, longitude },
-      } = await Location.getCurrentPositionAsync()
-      setInitLatitude(latitude)
-      setInitLongitude(longitude)
-
-      const place = await Location.reverseGeocodeAsync({
-        latitude: latitude,
-        longitude: longitude,
-      })
-      setInitPlace(
-        place[0].street +
-          ' - ' +
-          place[0].district +
-          ', ' +
-          place[0].subregion +
-          ' - ' +
-          place[0].region
-      )
+        const place = await Location.reverseGeocodeAsync({
+          latitude: latitude,
+          longitude: longitude,
+        })
+        setInitPlace([
+          place[0].subregion,
+          place[0].street,
+          place[0].street +
+            ' - ' +
+            place[0].district +
+            ', ' +
+            place[0].subregion +
+            ' - ' +
+            place[0].region,
+        ])
+      } catch (error) {
+        console.warn('alou3')
+        setInitLatitude(null)
+        setInitLongitude(null)
+        setInitPlace(['', '', ''])
+      }
 
       setGettingData(false)
     })()
@@ -196,7 +213,8 @@ const RegistrationScreen = ({ route }) => {
             photo1: route.params.photo1,
             photo2: route.params.photo2,
             photo3: route.params.photo3,
-            local: route.params.local === null ? initPlace : route.params.local,
+            local:
+              route.params.local === null ? initPlace[2] : route.params.local,
             latitude: initLatitude,
             longitude: initLongitude,
             grupo_taxonomico: route.params.grupo_taxonomico,
@@ -239,7 +257,18 @@ const RegistrationScreen = ({ route }) => {
               ? OccurrenceSchemaForAgent
               : OccurrenceSchemaForCitizen
           }
-          onSubmit={(values) => console.log('Send pressed')}
+          onSubmit={(values) => {
+            sendAttempt(
+              values,
+              new Date(),
+              'Pontual',
+              initPlace[0],
+              initPlace[1],
+              userToken,
+              setAlertMsg,
+              setShowAlert
+            )
+          }}
         >
           {({
             values,
@@ -337,26 +366,31 @@ const RegistrationScreen = ({ route }) => {
                     activeOpacity={0.7}
                     onPress={() => {
                       ;(async () => {
-                        const {
-                          coords: { latitude, longitude },
-                        } = await Location.getCurrentPositionAsync()
-                        setFieldValue('latitude', latitude)
-                        setFieldValue('longitude', longitude)
+                        try {
+                          const {
+                            coords: { latitude, longitude },
+                          } = await Location.getCurrentPositionAsync({
+                            enableHighAccuracy: true,
+                          })
+                          setFieldValue('latitude', latitude)
+                          setFieldValue('longitude', longitude)
 
-                        const place = await Location.reverseGeocodeAsync({
-                          latitude: latitude,
-                          longitude: longitude,
-                        })
-                        setFieldValue(
-                          'local',
-                          place[0].street +
-                            ' - ' +
-                            place[0].district +
-                            ', ' +
-                            place[0].subregion +
-                            ' - ' +
-                            place[0].region
-                        )
+                          const place = await Location.reverseGeocodeAsync({
+                            latitude: latitude,
+                            longitude: longitude,
+                          })
+                          setFieldValue(
+                            'local',
+                            place[0].street +
+                              ' - ' +
+                              place[0].district +
+                              ', ' +
+                              place[0].subregion +
+                              ' - ' +
+                              place[0].region
+                          )
+                          setInitPlace([place[0].subregion, place[0].street])
+                        } catch (error) {}
                       })()
                     }}
                     disabled={!route.params.editable}
@@ -1003,6 +1037,12 @@ const RegistrationScreen = ({ route }) => {
           }
         </Formik>
       )}
+      <CustomAlert
+        msg={alertMsg}
+        showAlert={showAlert}
+        setShowAlert={setShowAlert}
+        onPress={() => navigation.goBack()}
+      />
       {isConnected ? null : <NoConnection />}
     </View>
   )

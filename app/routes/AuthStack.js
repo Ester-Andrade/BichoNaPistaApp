@@ -194,6 +194,7 @@ const DrawerNavigator = () => {
           headerTitleStyle: {
             fontFamily: 'Alata_400Regular',
           },
+          headerTitleAlign: 'center'
         }}
       />
     </Drawer.Navigator>
