@@ -241,6 +241,51 @@ app.get('/encontradoEm', function (req, res) {
   })
 })
 
+// app.post('/occurrence', (req, res) => {
+//   var hash = sha256.create()
+
+//   hash.update(req.body.password)
+//   const passwordHash = hash.hex()
+//   const email = req.body.email
+//   const name = req.body.fullName
+//   const phone = req.body.phone
+
+//   connection.getConnection((err, connection) => {
+//     if (err) {
+//       console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
+//     } else {
+//       connection.query(
+//         'SELECT * FROM usuario WHERE Email = ?',
+//         [email],
+//         (err, result) => {
+//           if (err) {
+//             res.send(err)
+//           }
+//           if (result.length == 0) {
+//             connection.query(
+//               'INSERT INTO usuario (Email, Senha, NomeCompleto, Telefone, Perfil) VALUES (?,?,?,?,2)',
+//               [email, passwordHash, name, phone],
+//               (error, response) => {
+//                 if (err) {
+//                   res.send(err)
+//                 }
+//                 res.send({
+//                   Added: true,
+//                   msg: 'Usuário cadastrado com sucesso.', // Verifique seu endereço de email para fazer login.
+//                 })
+//               }
+//             )
+//           } else {
+//             res.send({ Added: false, msg: 'Esse email já está em uso.' })
+//           }
+//         }
+//       )
+//     }
+//     if (connection) connection.release()
+//     return
+//   })
+// })
+
 //ultmos registro
 
 //Meus regstros
@@ -251,5 +296,5 @@ app.get('/encontradoEm', function (req, res) {
 
 // Iniciando o servidor.
 app.listen(3000, () => {
-  console.log('Rodando em http://localhost:3000/ !')
+  console.log('Rodando em http://localhost:3000/ ! \n\n\n')
 })
