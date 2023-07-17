@@ -56,4 +56,4 @@ dist/
 
 # My PC Ip file
 /app/config/MyPcIp.js
-/app/config/server.js
+/app/config/S3Keys.js

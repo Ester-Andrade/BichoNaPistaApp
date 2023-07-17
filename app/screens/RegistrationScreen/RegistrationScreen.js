@@ -128,6 +128,7 @@ const RegistrationScreen = ({ navigation, route }) => {
 
   // ========================= control states =========================
   const [gettingData, setGettingData] = useState(true)
+  const [sendingData, setSendingData] = useState(false)
   const [type, setType] = useState(userType === 1 ? 'shrinker' : 'expander')
   const [advancedOpIsOpen, setAdvancedOpIsOpen] = useState(userType === 1)
   const [openCamera, setOpenCamera] = useState(false)
@@ -201,7 +202,7 @@ const RegistrationScreen = ({ navigation, route }) => {
   return (
     <View style={{ flex: 1 }}>
       <CustomHeader />
-      {gettingData ? (
+      {gettingData || sendingData ? (
         <View
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
         >
@@ -261,12 +262,12 @@ const RegistrationScreen = ({ navigation, route }) => {
             sendAttempt(
               values,
               new Date(),
-              'Pontual',
               initPlace[0],
               initPlace[1],
               userToken,
               setAlertMsg,
-              setShowAlert
+              setShowAlert,
+              setSendingData,
             )
           }}
         >
@@ -323,7 +324,7 @@ const RegistrationScreen = ({ navigation, route }) => {
                       setWPhoto('photo3')
                       setOpenCamera(true)
                     }}
-                    setPhoto={(value) => setFieldValue('photo1', value)}
+                    setPhoto={(value) => setFieldValue('photo3', value)}
                     disabled={!route.params.editable}
                   />
                 </View>
