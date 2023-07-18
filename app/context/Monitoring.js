@@ -186,7 +186,7 @@ export const MonitoringProvider = ({ children }) => {
         AsyncStorage.setItem('monitoringQueue', JSON.stringify(monitoringQueue))
       }
       setAlertMsg(
-        'Você está sem conexão à internet! \n\nSeu registro foi adicionado a fila e será enviado assim que a conexão for restaurada, ou da próxima vez que abrir o app com conexão.'
+        'Você está sem conexão à internet! \n\nSeu monitoramento será salvo assim que a conexão for restaurada, ou da próxima vez que abrir o app com conexão.'
       )
       setShowAlert(true)
     }
@@ -207,20 +207,75 @@ export const MonitoringProvider = ({ children }) => {
     descr,
     occurrences
   ) => {
-    console.log(
-      latitudeI,
-      longitudeI,
-      latitudeF,
-      longitudeF,
-      iDateTime,
-      fDateTime,
-      user,
-      nPeople,
-      monitoring,
-      speed,
-      descr,
-      occurrences
-    )
+    const iDateTime2 = new Date(iDateTime)
+    const iDate =
+      iDateTime2.getFullYear() +
+      '-' +
+      (iDateTime2.getMonth() + 1) +
+      '-' +
+      iDateTime2.getDate()
+    const iTime =
+      iDateTime2.getHours() +
+      ':' +
+      iDateTime2.getMinutes() +
+      ':' +
+      iDateTime2.getSeconds()
+    const fDateTime2 = new Date(fDateTime)
+    const fDate =
+      fDateTime2.getFullYear() +
+      '-' +
+      (fDateTime2.getMonth() + 1) +
+      '-' +
+      fDateTime2.getDate()
+    const fTime =
+      fDateTime2.getHours() +
+      ':' +
+      fDateTime2.getMinutes() +
+      ':' +
+      fDateTime2.getSeconds()
+
+    // communication with the server
+    try {
+      await fetch('http://' + PcIP + ':3000/monitoring', {
+        method: 'POST',
+        body: JSON.stringify({
+          latitudeI: latitudeI,
+          longitudeI: longitudeI,
+          latitudeF: latitudeF,
+          longitudeF: longitudeF,
+          iDate: iDate,
+          fDate: fDate,
+          iTime: iTime,
+          fTime: fTime,
+          user: user,
+          nPeople: nPeople,
+          monitoring: monitoring,
+          speed: speed,
+          descr: descr,
+        }),
+        headers: {
+          'Content-type': 'application/json',
+        },
+      })
+        .then((response) => response.json())
+        .then((body) => {
+          occurrences.map(async (occurrence) => {
+            await send(
+              occurrence[0],
+              occurrence[1],
+              'Sistemático',
+              occurrence[2],
+              occurrence[3],
+              occurrence[4],
+              body.ID
+            )
+          })
+        })
+    } catch (e) {
+      console.log(
+        'Ocorreu um erro ao se conectar ao servidor, tente novamente mais tarde'
+      )
+    }
   }
 
   useEffect(() => {
@@ -231,7 +286,7 @@ export const MonitoringProvider = ({ children }) => {
           monitoringQueue = JSON.parse(monitoringQueue)
           monitoringQueue.map(
             async (monitoring) =>
-              await send(
+              await sendM(
                 monitoring[0],
                 monitoring[1],
                 monitoring[2],

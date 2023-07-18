@@ -1,5 +1,5 @@
 import React, { useContext } from 'react'
-import { View, Text, Image } from 'react-native'
+import { View, Text, Image, Alert } from 'react-native'
 import {
   createDrawerNavigator,
   DrawerContentScrollView,

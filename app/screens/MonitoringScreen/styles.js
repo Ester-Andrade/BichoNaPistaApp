@@ -69,6 +69,15 @@ const styles = StyleSheet.create({
     width: '83.33%',
     alignSelf: 'center',
   },
+  errors: {
+    alignSelf: 'baseline',
+    paddingLeft: 8,
+    marginHorizontal: '7.5%',
+    marginTop: 2,
+    marginBottom: -17 * scale,
+    color: colors.red,
+    fontSize: 10 * scale,
+  },
   txtArea: {
     width: '83.33%',
     alignSelf: 'center',

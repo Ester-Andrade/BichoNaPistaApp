@@ -3,6 +3,7 @@ import { ScrollView, View, Text, ActivityIndicator } from 'react-native'
 import {
   useFonts,
   SourceSansPro_400Regular,
+  SourceSansPro_400Regular_Italic,
   SourceSansPro_300Light,
 } from '@expo-google-fonts/source-sans-pro'
 import { useIsConnected } from 'react-native-offline'
@@ -18,6 +19,7 @@ import NoConnection from '../../components/NoConnection'
 import getData from './MonitoringScreenContainer'
 import colors from '../../config/styles'
 import styles from './styles'
+import moment from 'moment'
 
 const MonitoringScreen = ({ navigation }) => {
   const {
@@ -45,6 +47,7 @@ const MonitoringScreen = ({ navigation }) => {
   const [showAlert, setShowAlert] = useState(false)
   const [alertMsg, setAlertMsg] = useState(true)
   const [MoniOp, setMoniOp] = useState([])
+  const [time, setTime] = useState(0)
 
   const isConnected = useIsConnected()
 
@@ -54,10 +57,52 @@ const MonitoringScreen = ({ navigation }) => {
 
       setGettingData(false)
     })()
-  }, [])
+
+    if (finished) {
+      setTime(
+        Math.floor(
+          moment(finalDateTime, 'DD/MM/YYYY HH:mm:ss').diff(moment(initialDateTime, 'DD/MM/YYYY HH:mm:ss')) / 1000
+        )
+      )      
+    }
+
+    let interval = null
+
+    if (inMonitoring) {
+      setTime(
+        Math.floor(
+          moment().diff(moment(initialDateTime, 'DD/MM/YYYY HH:mm:ss')) / 1000
+        )
+      )
+
+      interval = setInterval(() => {
+        setTime((time) => time + 1)
+      }, 1000)
+    } else {
+      clearInterval(interval)
+    }
+    return () => {
+      clearInterval(interval)
+    }
+  }, [inMonitoring])
+
+  const timer = () => {
+    var sec = time % 60
+    var min = Math.floor(time / 60)
+    var hour = Math.floor(time / 3600)
+
+    return (
+      ('00' + hour).slice(-2) +
+      ':' +
+      ('00' + min).slice(-2) +
+      ':' +
+      ('00' + sec).slice(-2)
+    )
+  }
 
   let [fontsLoaded] = useFonts({
     SourceSansPro_400Regular,
+    SourceSansPro_400Regular_Italic,
     SourceSansPro_300Light,
   })
 
@@ -88,7 +133,7 @@ const MonitoringScreen = ({ navigation }) => {
           <Text
             style={[styles.timer, { fontFamily: 'SourceSansPro_300Light' }]}
           >
-            00:00:00
+            {timer()}
           </Text>
           <View style={styles.field}>
             <Text
@@ -142,16 +187,16 @@ const MonitoringScreen = ({ navigation }) => {
               <Text
                 style={[
                   styles.text2,
-                  false ? { color: colors.darkGray2 } : null,
+                  inMonitoring || finished ? { color: colors.darkGray2 } : null,
                   { fontFamily: 'SourceSansPro_400Regular' },
                 ]}
               >
                 {inMonitoring || finished
-                  ? initialDateTime.getHours() +
+                  ? ('00' + initialDateTime.getHours()).slice(-2) +
                     ':' +
-                    initialDateTime.getMinutes() +
+                    ('00' + initialDateTime.getMinutes()).slice(-2) +
                     ':' +
-                    initialDateTime.getSeconds()
+                    ('00' + initialDateTime.getSeconds()).slice(-2)
                   : '00:00:00'}
               </Text>
               <Text
@@ -175,16 +220,16 @@ const MonitoringScreen = ({ navigation }) => {
               <Text
                 style={[
                   styles.text2,
-                  false ? { color: colors.darkGray2 } : null,
+                  finished ? { color: colors.darkGray2 } : null,
                   { fontFamily: 'SourceSansPro_400Regular' },
                 ]}
               >
                 {finished
-                  ? finalDateTime.getHours() +
+                  ? ('00' + finalDateTime.getHours()).slice(-2) +
                     ':' +
-                    finalDateTime.getMinutes() +
+                    ('00' + finalDateTime.getMinutes()).slice(-2) +
                     ':' +
-                    finalDateTime.getSeconds()
+                    ('00' + finalDateTime.getSeconds()).slice(-2)
                   : '00:00:00'}
               </Text>
               <Text
@@ -227,6 +272,18 @@ const MonitoringScreen = ({ navigation }) => {
             setValue={(value) => setNPeople(value)}
             style={[styles.finalFields, { marginTop: 3 }]}
           />
+          {/^[0-9]+$/.test(nPeople) || nPeople === '' ? null : (
+            <Text
+              style={[
+                styles.errors,
+                {
+                  fontFamily: 'SourceSansPro_400Regular_Italic',
+                },
+              ]}
+            >
+              Deve usar apenas dígitos.
+            </Text>
+          )}
           <CustomTextInput
             placeholder="Velocidade do monitoramento (km/h):"
             label="Velocidade do monitoramento (km/h):"
@@ -234,6 +291,18 @@ const MonitoringScreen = ({ navigation }) => {
             setValue={(value) => setSpeed(value)}
             style={[styles.finalFields, { marginTop: 4 }]}
           />
+          {/^[0-9]+$/.test(speed) || speed === '' ? null : (
+            <Text
+              style={[
+                styles.errors,
+                {
+                  fontFamily: 'SourceSansPro_400Regular_Italic',
+                },
+              ]}
+            >
+              Deve usar apenas dígitos.
+            </Text>
+          )}
           <CustomTextArea
             label={' Descrição do monitoramento '}
             value={descr}
@@ -247,7 +316,14 @@ const MonitoringScreen = ({ navigation }) => {
             }
             title="Salvar monitoramento"
             disabled={
-              !(finished && mode !== null && nPeople !== '' && speed !== '')
+              !(
+                finished &&
+                mode !== null &&
+                nPeople !== '' &&
+                /^[0-9]+$/.test(nPeople) &&
+                speed !== '' &&
+                /^[0-9]+$/.test(speed)
+              )
             }
             style={styles.button2}
           />
