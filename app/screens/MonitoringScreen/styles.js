@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
     fontSize: 12 * scale,
   },
   fieldContent: {
-    marginLeft: '4.68%',
+    marginHorizontal: '4.68%',
     color: colors.darkGray2,
     fontSize: 12 * scale,
   },

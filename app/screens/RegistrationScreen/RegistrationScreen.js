@@ -12,6 +12,7 @@ import * as Yup from 'yup'
 import { useIsConnected } from 'react-native-offline'
 import { AuthContext } from '../../context/Auth'
 import { RegistrationContext } from '../../context/Registration'
+import { MonitoringContext } from '../../context/Monitoring'
 import * as Location from 'expo-location'
 import CustomHeader from '../../components/CustomHeader'
 import CameraComponent from '../CameraView/CameraView'
@@ -96,6 +97,7 @@ const OccurrenceSchemaForCitizen = Yup.object().shape({
 const RegistrationScreen = ({ navigation, route }) => {
   const { userType, userToken } = useContext(AuthContext)
   const { sendAttempt } = useContext(RegistrationContext)
+  const { inMonitoring, addOccurrence } = useContext(MonitoringContext)
 
   // ========================= form's data options =========================
   const [grupoTaxOp, setGrupoTaxOp] = useState([])
@@ -185,9 +187,11 @@ const RegistrationScreen = ({ navigation, route }) => {
         ])
       } catch (error) {
         console.warn('alou3')
-        setInitLatitude(null)
-        setInitLongitude(null)
         setInitPlace(['', '', ''])
+        setAlertMsg(
+          'Não é possível prosseguir sem a localização! \n\nVerifique se o GPS está ligado.'
+        )
+        setShowAlert(true)
       }
 
       setGettingData(false)
@@ -259,16 +263,22 @@ const RegistrationScreen = ({ navigation, route }) => {
               : OccurrenceSchemaForCitizen
           }
           onSubmit={(values) => {
-            sendAttempt(
-              values,
-              new Date(),
-              initPlace[0],
-              initPlace[1],
-              userToken,
-              setAlertMsg,
-              setShowAlert,
-              setSendingData,
-            )
+            inMonitoring
+              ? addOccurrence(
+                  [values, new Date(), initPlace[0], initPlace[1], userToken],
+                  setAlertMsg,
+                  setShowAlert
+                )
+              : sendAttempt(
+                  values,
+                  new Date(),
+                  initPlace[0],
+                  initPlace[1],
+                  userToken,
+                  setAlertMsg,
+                  setShowAlert,
+                  setSendingData
+                )
           }}
         >
           {({

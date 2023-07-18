@@ -8,6 +8,7 @@ import {
 } from '@react-navigation/drawer'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { AuthContext } from '../context/Auth'
+import { MonitoringContext } from '../context/Monitoring'
 import HomeScreen from '../screens/HomeScreen'
 import RegistrationScreen from '../screens/RegistrationScreen'
 import MonitoringScreen from '../screens/MonitoringScreen'
@@ -22,6 +23,8 @@ const Stack = createNativeStackNavigator()
 
 const CustomDrawerContent = (props) => {
   const { userName, userType, logOut } = useContext(AuthContext)
+  const { inMonitoring, finished, clearMonitoringVar } =
+    useContext(MonitoringContext)
 
   const { state, ...rest } = props
   const newState = { ...state }
@@ -219,7 +222,24 @@ const CustomDrawerContent = (props) => {
             resizeMode="contain"
           />
         )}
-        onPress={() => logOut()}
+        onPress={() => {
+          inMonitoring || finished
+            ? Alert.alert(
+                'Monitoramento em andamento!',
+                'Existe um monitoramento em andamento, ou não enviado, sair da sua conta irá cancelar o monitoramento em questão. \n Tem certeza que deseja sair ?',
+                [
+                  {
+                    text: 'Sim',
+                    onPress: () => {
+                      clearMonitoringVar()
+                      logOut()
+                    },
+                  },
+                  { text: 'Não', onPress: () => null },
+                ]
+              )
+            : logOut()
+        }}
         labelStyle={{
           marginLeft: -16,
           alignItems: 'baseline',
@@ -265,7 +285,7 @@ const DrawerNavigator = () => {
           headerTitleStyle: {
             fontFamily: 'Alata_400Regular',
           },
-          headerTitleAlign: 'center'
+          headerTitleAlign: 'center',
         }}
       />
     </Drawer.Navigator>

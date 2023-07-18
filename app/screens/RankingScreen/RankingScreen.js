@@ -7,7 +7,7 @@ import {
   SourceSansPro_600SemiBold_Italic,
   SourceSansPro_600SemiBold,
 } from '@expo-google-fonts/source-sans-pro'
-import { NetworkConsumer } from 'react-native-offline'
+import { useIsConnected } from 'react-native-offline'
 import CustomHeader from '../../components/CustomHeader'
 import CustomDivider from '../../components/CustomDivider'
 import colors from '../../config/styles'
@@ -15,6 +15,7 @@ import images from '../../config/images'
 import styles from './styles'
 
 const RankingScreen = () => {
+  const isConnected = useIsConnected()
   const data = [
     'Jésssica Pacheco',
     'Ronaldo Ferreira',
@@ -201,9 +202,7 @@ const RankingScreen = () => {
             </View>
           </View>
       </ScrollView>
-      <NetworkConsumer>
-        {({ isConnected }) => (isConnected ? null : <NoConnection />)}
-      </NetworkConsumer>
+      {isConnected ? null : <NoConnection />}
     </View>
   )
 }

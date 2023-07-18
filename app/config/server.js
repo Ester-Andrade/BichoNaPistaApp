@@ -417,6 +417,65 @@ app.post('/occurrence', (req, res) => {
   })
 })
 
+app.get('/formaMonitoramento', function (req, res) {
+  connection.getConnection((err, connection) => {
+    if (err) {
+      console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
+    } else {
+      connection.query(
+        'SELECT * FROM formamonitoramento',
+        (error, results, fields) => {
+          res.send(results)
+        }
+      )
+    }
+    if (connection) connection.release()
+    return
+  })
+})
+
+app.post('/monitoring', (req, res) => {
+  const latitudeI = req.body.latitudeI
+  const longitudeI = req.body.longitudeI
+  const latitudeF = req.body.latitudeF
+  const longitudeF = req.body.longitudeF
+  const iDate = req.body.iDate
+  const fDate = req.body.fDate
+  const iTime = req.body.iTime
+  const fTime = req.body.fTime
+  const user = req.body.user
+  const nPeople = req.body.nPeople
+  const monitoring = req.body.monitoring
+  const speed = req.body.speed
+  const descr = req.body.descr
+
+  connection.getConnection((err, connection) => {
+    if (err) {
+      console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
+    } else {
+      connection.query(
+        'INSERT INTO monitoramento (LatitudeInicial, LongitudeInicial, LatitudeFinal, LongitudeFinal, DataInicial, DataFinal, HoraInicial, HoraFinal, Usuario, NumPessoasMonitorando, FormaMonitoramento, VelocidadeMonitoramento, DescrMonitoramento) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+        [latitudeI, longitudeI, latitudeF, longitudeF, iDate, fDate, iTime, fTime, user, nPeople, monitoring, speed, descr],
+        (error, response) => {
+          if (err) {
+            console.log(err)
+          } else {
+            connection.query('SELECT LAST_INSERT_ID()', (error, results) => {
+              if (err) {
+                console.log(err)
+              } else {
+                res.send({ ID: results[0]['LAST_INSERT_ID()'] })
+              }
+            })
+          }
+        }
+      )
+    }
+    if (connection) connection.release()
+    return
+  })
+})
+
 //ultmos registro
 
 //Meus regstros

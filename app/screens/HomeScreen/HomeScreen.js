@@ -14,7 +14,7 @@ import {
   SourceSansPro_700Bold_Italic,
   SourceSansPro_400Regular_Italic,
 } from '@expo-google-fonts/source-sans-pro'
-import { NetworkConsumer } from 'react-native-offline'
+import { useIsConnected } from 'react-native-offline'
 import * as Location from 'expo-location'
 import MapView, {
   Callout,
@@ -52,6 +52,8 @@ const initialRegion = {
 const HomeScreen = ({ navigation }) => {
   const [region, setRegion] = useState()
 
+  const isConnected = useIsConnected()
+
   const getCurrentPosition = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync()
 
@@ -59,11 +61,18 @@ const HomeScreen = ({ navigation }) => {
       Alert.alert('Ops!', 'Permissão de acesso a localização negada.')
     }
 
-    let {
-      coords: { latitude, longitude },
-    } = await Location.getCurrentPositionAsync()
+    try {
+      let {
+        coords: { latitude, longitude },
+      } = await Location.getCurrentPositionAsync()
 
-    setRegion({ latitude, longitude, latitudeDelta: 0.7, longitudeDelta: 0.7 })
+      setRegion({
+        latitude,
+        longitude,
+        latitudeDelta: 0.7,
+        longitudeDelta: 0.7,
+      })
+    } catch (e) {}
   }
 
   useEffect(() => {
@@ -80,7 +89,7 @@ const HomeScreen = ({ navigation }) => {
     '#99FF99',
     '#B34D4D',
   ]
-  
+
   const translateY = useSharedValue(0)
 
   const scrollTo = useCallback((destination) => {
@@ -149,7 +158,7 @@ const HomeScreen = ({ navigation }) => {
                 keyExtractor={(item) => String(item)}
                 showsHorizontalScrollIndicator={false}
                 snapToOffsets={[...Array(data.length)].map(
-                  (x, i) => i * (WIDTH * 0.80 - 15) + (i - 1) * 30
+                  (x, i) => i * (WIDTH * 0.8 - 15) + (i - 1) * 30
                 )}
                 horizontal
                 snapToAlignment={'start'}
@@ -160,43 +169,51 @@ const HomeScreen = ({ navigation }) => {
                     <View style={styles.photo}></View>
                     <View style={styles.info}>
                       <Text
-                        style={[styles.title, { fontFamily: 'SourceSansPro_700Bold_Italic' }]}
+                        style={[
+                          styles.title,
+                          { fontFamily: 'SourceSansPro_700Bold_Italic' },
+                        ]}
                       >
                         Capivara
                       </Text>
                       <Text
                         numberOfLines={1}
-                        style={[ styles.text,
+                        style={[
+                          styles.text,
                           { fontFamily: 'SourceSansPro_400Regular_Italic' },
                         ]}
                       >
                         Hydrochoerus hydrochaeris
                       </Text>
                       <View style={styles.line}>
-                      <Text
-                        style={[styles.text,
-                          { fontFamily: 'SourceSansPro_400Regular_Italic' },
-                        ]}
-                      >
-                        05/08/2021
-                      </Text>
-                      <Text
-                        style={[styles.text,
-                          { fontFamily: 'SourceSansPro_400Regular_Italic' },
-                        ]}
-                      >
-                        10:30
-                      </Text>
+                        <Text
+                          style={[
+                            styles.text,
+                            { fontFamily: 'SourceSansPro_400Regular_Italic' },
+                          ]}
+                        >
+                          05/08/2021
+                        </Text>
+                        <Text
+                          style={[
+                            styles.text,
+                            { fontFamily: 'SourceSansPro_400Regular_Italic' },
+                          ]}
+                        >
+                          10:30
+                        </Text>
                       </View>
                       <Text
-                        style={[styles.text,
+                        style={[
+                          styles.text,
                           { fontFamily: 'SourceSansPro_400Regular_Italic' },
                         ]}
                       >
                         Mamífero
                       </Text>
                       <Text
-                        style={[styles.text,
+                        style={[
+                          styles.text,
                           { fontFamily: 'SourceSansPro_400Regular_Italic' },
                         ]}
                       >
@@ -269,9 +286,7 @@ const HomeScreen = ({ navigation }) => {
           </Animated.View>
         </GestureDetector>
       </View>
-      <NetworkConsumer>
-        {({ isConnected }) => (isConnected ? null : <NoConnection />)}
-      </NetworkConsumer>
+      {isConnected ? null : <NoConnection />}
     </View>
   )
 }

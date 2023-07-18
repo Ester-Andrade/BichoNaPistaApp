@@ -5,13 +5,14 @@ import {
   SourceSansPro_700Bold_Italic,
   SourceSansPro_400Regular_Italic,
 } from '@expo-google-fonts/source-sans-pro'
-import { NetworkConsumer } from 'react-native-offline'
+import { useIsConnected } from 'react-native-offline'
 import CustomHeader from '../../components/CustomHeader'
 import PressableText from '../../components/PressableText/PressableText'
 import images from '../../config/images'
 import styles from './styles'
 
 const MyRegistrationsScreen = () => {
+  const isConnected = useIsConnected()
   const data = [
     '#FF6633',
     '#FFB399',
@@ -115,9 +116,7 @@ const MyRegistrationsScreen = () => {
           </View>
         ))}
       </ScrollView>
-      <NetworkConsumer>
-        {({ isConnected }) => (isConnected ? null : <NoConnection />)}
-      </NetworkConsumer>
+      {isConnected ? null : <NoConnection />}
     </View>
   )
 }
