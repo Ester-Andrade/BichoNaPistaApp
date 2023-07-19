@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useIsConnected } from 'react-native-offline'
 import PcIP from '../config/MyPcIp'
 
 export const AuthContext = createContext()
@@ -9,6 +10,10 @@ export const AuthProvider = ({ children }) => {
   const [userToken, setUserToken] = useState(null)
   const [userName, setUserName] = useState(null)
   const [userType, setUserType] = useState(null)
+  const [rankPos, setRankPos] = useState(null)
+  const [nRegs, setNregs] = useState(null)
+
+  const isConnected = useIsConnected()
 
   const logIn = (email, password, setLoginFail) => {
     setIsLoading(true)
@@ -37,9 +42,30 @@ export const AuthProvider = ({ children }) => {
           AsyncStorage.setItem('userToken', JSON.stringify(userInfo.CodUsuario))
           AsyncStorage.setItem('userName', name)
           AsyncStorage.setItem('userType', JSON.stringify(userInfo.Perfil))
+          getProfileInfo(userInfo.Perfil, userInfo.CodUsuario)
         }
       })
     setIsLoading(false)
+  }
+
+  const getProfileInfo = (type, token) => {
+    fetch('http://' + PcIP + ':3000/rankingPosition', {
+      method: 'POST',
+      body: JSON.stringify({
+        type: type,
+        user: token,
+      }),
+      headers: {
+        'Content-type': 'application/json',
+      },
+    })
+      .then((response) => response.json())
+      .then((body) => {
+        setRankPos(body[0].RankResult)
+        setNregs(body[0].NregTot)
+        AsyncStorage.setItem('rankPos', JSON.stringify(body[0].RankResult))
+        AsyncStorage.setItem('nRegs', JSON.stringify(body[0].NregTot))
+      })
   }
 
   const logOut = () => {
@@ -47,9 +73,13 @@ export const AuthProvider = ({ children }) => {
     setUserToken(null)
     setUserName(null)
     setUserType(null)
+    setRankPos(null)
+    setNregs(null)
     AsyncStorage.removeItem('userToken')
     AsyncStorage.removeItem('userName')
     AsyncStorage.removeItem('userType')
+    AsyncStorage.removeItem('rankPos')
+    AsyncStorage.removeItem('nRegs')
     setIsLoading(false)
   }
 
@@ -62,6 +92,14 @@ export const AuthProvider = ({ children }) => {
       setUserName(userName)
       let userType = await AsyncStorage.getItem('userType')
       setUserType(JSON.parse(userType))
+      if (isConnected) {
+        getProfileInfo(userType, userToken)
+      } else {
+        let rankPosi = await AsyncStorage.getItem('rankPos')
+        setRankPos(JSON.parse(rankPosi))
+        let nRegis = await AsyncStorage.getItem('nRegs')
+        setNregs(JSON.parse(nRegis))
+      }
       setIsLoading(false)
     } catch (e) {
       console.log('isLogged in error ', e)
@@ -74,7 +112,7 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ isLoading, userToken, userName, userType, logIn, logOut }}
+      value={{ isLoading, userToken, userName, userType, rankPos, setRankPos, nRegs, setNregs, logIn, logOut }}
     >
       {children}
     </AuthContext.Provider>

@@ -22,7 +22,7 @@ const Drawer = createDrawerNavigator()
 const Stack = createNativeStackNavigator()
 
 const CustomDrawerContent = (props) => {
-  const { userName, userType, logOut } = useContext(AuthContext)
+  const { userName, userType, rankPos, nRegs, logOut } = useContext(AuthContext)
   const { inMonitoring, finished, clearMonitoringVar } =
     useContext(MonitoringContext)
 
@@ -75,7 +75,7 @@ const CustomDrawerContent = (props) => {
                 color: colors.darkGray2,
               }}
             >
-              Posição no ranking: 12º
+              Posição no ranking: {rankPos}º
             </Text>
             <Text
               style={{
@@ -85,7 +85,7 @@ const CustomDrawerContent = (props) => {
                 color: colors.darkGray2,
               }}
             >
-              Registros enviados: 50
+              Registros enviados: {nRegs}
             </Text>
           </View>
         </View>

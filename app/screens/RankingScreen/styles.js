@@ -27,7 +27,7 @@ const styles = StyleSheet.create({
   pos1: {
     alignItems: 'center',
     width: Dimensions.get('screen').width * 0.2822,
-    marginBottom: Dimensions.get('screen').width * 0.06,
+    marginBottom: Dimensions.get('screen').width * 0.04,
   },
   pos1Circle: {
     backgroundColor: colors.gray4,
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignSelf: 'flex-end',
     marginTop: Dimensions.get('screen').width * 0.09,
-    marginRight: Dimensions.get('screen').width * 0.028,
+    marginRight: Dimensions.get('screen').width * 0.015,
     marginBottom: -Dimensions.get('screen').width * 0.02,
   },
   pointsTitle: {
@@ -112,9 +112,30 @@ const styles = StyleSheet.create({
     resizeMode: 'contain',
     marginTop: 16 * scale,
   },
+  watermark2: {
+    alignSelf: 'center',
+    marginTop: '60%',
+    height: Dimensions.get('screen').width * 0.45,
+    opacity: 0.11,
+    resizeMode: 'contain',
+  },
   divider: {
     marginVertical: Dimensions.get('screen').width * 0.02,
   },
+  finalView: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center'
+  },
+  finalMargin:{
+    marginTop: Dimensions.get('screen').width * 0.1,
+  },
+  noConnectionText: {
+    alignSelf: 'center',
+    marginTop: 15 * scale,
+    fontSize: 15 * scale,
+    color: colors.gray4
+  }
 })
 
 export default styles

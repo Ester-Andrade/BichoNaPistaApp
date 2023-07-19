@@ -263,7 +263,8 @@ const RegistrationScreen = ({ navigation, route }) => {
               : OccurrenceSchemaForCitizen
           }
           onSubmit={(values) => {
-            inMonitoring
+            if (route.params.editable) {
+              inMonitoring
               ? addOccurrence(
                   [values, new Date(), initPlace[0], initPlace[1], userToken],
                   setAlertMsg,
@@ -279,6 +280,9 @@ const RegistrationScreen = ({ navigation, route }) => {
                   setShowAlert,
                   setSendingData
                 )
+            } else {
+              console.log('update')
+            }
           }}
         >
           {({

@@ -16,6 +16,7 @@ const images = {
     removeCircle: require('../images/remove-circle.png'),
     pinAdd: require('../images/pin-add-icon.png'),
     clock: require('../images/clock.png'),
+    noConnection: require('../images/noConnection.png')
   },
 }
 

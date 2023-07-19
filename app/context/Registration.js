@@ -1,11 +1,14 @@
-import React, { createContext, useEffect, useState } from 'react'
+import React, { createContext, useEffect, useContext } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useIsConnected } from 'react-native-offline'
+import { AuthContext } from './Auth'
 import PcIP from '../config/MyPcIp'
 
 export const RegistrationContext = createContext()
 
 export const RegistrationProvider = ({ children }) => {
+  const { nRegs, setNregs } = useContext(AuthContext)
+
   const isConnected = useIsConnected()
 
   const sendAttempt = async (
@@ -123,6 +126,7 @@ export const RegistrationProvider = ({ children }) => {
         'Ocorreu um erro ao se conectar ao servidor, tente novamente mais tarde'
       )
     }
+    setNregs(nRegs + 1)
   }
 
   // Send photo to s3

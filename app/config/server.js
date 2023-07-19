@@ -455,7 +455,21 @@ app.post('/monitoring', (req, res) => {
     } else {
       connection.query(
         'INSERT INTO monitoramento (LatitudeInicial, LongitudeInicial, LatitudeFinal, LongitudeFinal, DataInicial, DataFinal, HoraInicial, HoraFinal, Usuario, NumPessoasMonitorando, FormaMonitoramento, VelocidadeMonitoramento, DescrMonitoramento) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
-        [latitudeI, longitudeI, latitudeF, longitudeF, iDate, fDate, iTime, fTime, user, nPeople, monitoring, speed, descr],
+        [
+          latitudeI,
+          longitudeI,
+          latitudeF,
+          longitudeF,
+          iDate,
+          fDate,
+          iTime,
+          fTime,
+          user,
+          nPeople,
+          monitoring,
+          speed,
+          descr,
+        ],
         (error, response) => {
           if (err) {
             console.log(err)
@@ -476,13 +490,52 @@ app.post('/monitoring', (req, res) => {
   })
 })
 
+app.post('/ranking', (req, res) => {
+  const type = req.body.type
+
+  connection.getConnection((err, connection) => {
+    if (err) {
+      console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
+    } else {
+      connection.query(
+        'SELECT T1.CodUsuario, nome, NregMes, NregTot, RankResult FROM ( SELECT CodUsuario, NomeCompleto AS nome, count(o.CodOcorrencia) AS NregMes, RANK() OVER (ORDER BY count(o.CodOcorrencia) DESC ) AS RankResult FROM (SELECT * FROM ocorrencia WHERE MONTH(DataRegistro) = MONTH(NOW())) AS o RIGHT JOIN usuario AS u ON o.Usuario = u.CodUsuario WHERE u.Perfil = ? GROUP BY CodUsuario) AS T1 INNER JOIN ( SELECT CodUsuario, count(o.CodOcorrencia) AS NregTot FROM ocorrencia AS o RIGHT JOIN usuario AS u ON o.Usuario = u.CodUsuario WHERE u.Perfil = ? GROUP BY CodUsuario) AS T2 ON T1.CodUsuario = T2.CodUsuario LIMIT 10',
+        [type, type],
+        (error, results) => {
+          res.send(results)
+        }
+      )
+    }
+    if (connection) connection.release()
+    return
+  })
+})
+
+app.post('/rankingPosition', (req, res) => {
+  const type = req.body.type
+  const user = req.body.user
+
+  connection.getConnection((err, connection) => {
+    if (err) {
+      console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
+    } else {
+      connection.query(
+        'SELECT * FROM (SELECT T1.CodUsuario, nome, NregMes, NregTot, RankResult FROM ( SELECT CodUsuario, NomeCompleto AS nome, count(o.CodOcorrencia) AS NregMes, RANK() OVER (ORDER BY count(o.CodOcorrencia) DESC ) AS RankResult FROM (SELECT * FROM ocorrencia WHERE MONTH(DataRegistro) = MONTH(NOW())) AS o RIGHT JOIN usuario AS u ON o.Usuario = u.CodUsuario WHERE u.Perfil = ? GROUP BY CodUsuario) AS T1 INNER JOIN ( SELECT CodUsuario, count(o.CodOcorrencia) AS NregTot FROM ocorrencia AS o RIGHT JOIN usuario AS u ON o.Usuario = u.CodUsuario WHERE u.Perfil = ? GROUP BY CodUsuario) AS T2 ON T1.CodUsuario = T2.CodUsuario) AS ranking WHERE ranking.CodUsuario = ?',
+        [type, type, user],
+        (error, results) => {
+          res.send(results)
+        }
+      )
+    }
+    if (connection) connection.release()
+    return
+  })
+})
+
 //ultmos registro
 
 //Meus regstros
 
 //registros a complementar
-
-//ranking
 
 // Iniciando o servidor.
 app.listen(3000, () => {
