@@ -6,6 +6,7 @@ import {
   SourceSansPro_400Regular_Italic,
 } from '@expo-google-fonts/source-sans-pro'
 import { useIsConnected } from 'react-native-offline'
+import NoConnection from '../../components/NoConnection'
 import CustomHeader from '../../components/CustomHeader'
 import PressableText from '../../components/PressableText/PressableText'
 import images from '../../config/images'

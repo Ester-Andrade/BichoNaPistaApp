@@ -96,7 +96,8 @@ const OccurrenceSchemaForCitizen = Yup.object().shape({
 
 const RegistrationScreen = ({ navigation, route }) => {
   const { userType, userToken } = useContext(AuthContext)
-  const { sendAttempt } = useContext(RegistrationContext)
+  const { sendAttempt, uploadAttempt, uploadLocalData } =
+    useContext(RegistrationContext)
   const { inMonitoring, addOccurrence } = useContext(MonitoringContext)
 
   // ========================= form's data options =========================
@@ -159,39 +160,41 @@ const RegistrationScreen = ({ navigation, route }) => {
         setVegetacaoOp,
         setEncontradoEmOp
       )
-      console.warn('alou')
-      try {
-        const {
-          coords: { latitude, longitude },
-        } = await Location.getCurrentPositionAsync({
-          enableHighAccuracy: true,
-        })
-        console.warn('alou2')
-        setInitLatitude(latitude)
-        setInitLongitude(longitude)
+      if (route.params.editable) {
+        console.warn('alou')
+        try {
+          const {
+            coords: { latitude, longitude },
+          } = await Location.getCurrentPositionAsync({
+            enableHighAccuracy: true,
+          })
+          console.warn('alou2')
+          setInitLatitude(latitude)
+          setInitLongitude(longitude)
 
-        const place = await Location.reverseGeocodeAsync({
-          latitude: latitude,
-          longitude: longitude,
-        })
-        setInitPlace([
-          place[0].subregion,
-          place[0].street,
-          place[0].street +
-            ' - ' +
-            place[0].district +
-            ', ' +
-            place[0].subregion +
-            ' - ' +
-            place[0].region,
-        ])
-      } catch (error) {
-        console.warn('alou3')
-        setInitPlace(['', '', ''])
-        setAlertMsg(
-          'Não é possível prosseguir sem a localização! \n\nVerifique se o GPS está ligado.'
-        )
-        setShowAlert(true)
+          const place = await Location.reverseGeocodeAsync({
+            latitude: latitude,
+            longitude: longitude,
+          })
+          setInitPlace([
+            place[0].subregion,
+            place[0].street,
+            place[0].street +
+              ' - ' +
+              place[0].district +
+              ', ' +
+              place[0].subregion +
+              ' - ' +
+              place[0].region,
+          ])
+        } catch (error) {
+          console.warn('alou3')
+          setInitPlace(['', '', ''])
+          setAlertMsg(
+            'Não é possível prosseguir sem a localização! \n\nVerifique se o GPS está ligado.'
+          )
+          setShowAlert(true)
+        }
       }
 
       setGettingData(false)
@@ -265,23 +268,39 @@ const RegistrationScreen = ({ navigation, route }) => {
           onSubmit={(values) => {
             if (route.params.editable) {
               inMonitoring
-              ? addOccurrence(
-                  [values, new Date(), initPlace[0], initPlace[1], userToken],
-                  setAlertMsg,
-                  setShowAlert
-                )
-              : sendAttempt(
-                  values,
-                  new Date(),
-                  initPlace[0],
-                  initPlace[1],
-                  userToken,
-                  setAlertMsg,
-                  setShowAlert,
-                  setSendingData
-                )
+                ? addOccurrence(
+                    [values, new Date(), initPlace[0], initPlace[1], userToken],
+                    setAlertMsg,
+                    setShowAlert
+                  )
+                : sendAttempt(
+                    values,
+                    new Date(),
+                    initPlace[0],
+                    initPlace[1],
+                    userToken,
+                    especieOp[values.especie].NomeComum,
+                    setAlertMsg,
+                    setShowAlert,
+                    setSendingData
+                  )
             } else {
-              console.log('update')
+              route.params.offData
+                ? uploadLocalData(
+                    route.params.id,
+                    values.destinacao,
+                    setAlertMsg,
+                    setShowAlert,
+                    setSendingData
+                  )
+                : uploadAttempt(
+                    route.params.id,
+                    values.destinacao,
+                    route.params.oStatus,
+                    setAlertMsg,
+                    setShowAlert,
+                    setSendingData
+                  )
             }
           }}
         >
@@ -1043,7 +1062,7 @@ const RegistrationScreen = ({ navigation, route }) => {
                 ) : null}
                 <CustomButton
                   onPress={handleSubmit}
-                  title="Enviar"
+                  title={route.params.editable ? 'Enviar' : 'Atualizar'}
                   disabled={!isValid}
                   style={advancedOpIsOpen ? styles.sendBtn : styles.sendBtn2}
                 />

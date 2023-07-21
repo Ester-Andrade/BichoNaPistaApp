@@ -566,9 +566,149 @@ app.post('/getPhoto', (req, res) => {
   })
 })
 
-//Meus regstros
+app.post('/toComplementRecords', (req, res) => {
+  const user = req.body.user
 
-//registros a complementar
+  connection.getConnection((err, connection) => {
+    if (err) {
+      console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
+    } else {
+      connection.query(
+        'SELECT o.CodOcorrencia, o.Especie, e.NomeComum, o.NomeComumNaoCadastrado, o.NomeCientificoNaoCadastrado, o.GrupoTaxonomico, o.NumeroIndividuos, o.Foto1, o.Foto2, o.Foto3, o.Sexo, o.CondicaoAnimal, o.AnimalVivo, o.Causa, o.InstituicaoDepositaria, o.Endereco, o.AnimalEmUC, o.Sentido, o.Km, o.TipoVia, o.TipoPavimento, o.NumPistas, o.NumFaixas, o.VelocidadeMax, o.Intervencao, o.DescrIntervencao, o.Vazamento, o.DescrVazamento, o.EncontradoEm, o.CondicaoTempo, o.LagoRioRiacho, o.Observacoes, o.STATUS, o.DataRegistro, o.HoraRegistro FROM ocorrencia AS o LEFT JOIN especie AS e ON o.Especie = e.CodEspecie WHERE usuario = ? AND (STATUS = "Em análise e a complementar" OR STATUS = "Validado e a complementar") ORDER BY o.CodOcorrencia DESC',
+        [user],
+        (error, results) => {
+          res.send(results)
+        }
+      )
+    }
+    if (connection) connection.release()
+    return
+  })
+})
+
+app.post('/destinationRecords', (req, res) => {
+  const ID = req.body.recordID
+
+  connection.getConnection((err, connection) => {
+    if (err) {
+      console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
+    } else {
+      connection.query(
+        'SELECT DestinoAnimal FROM destinoanimalocorrencia WHERE Ocorrencia = ?',
+        [ID],
+        (error, results) => {
+          res.send(results)
+        }
+      )
+    }
+    if (connection) connection.release()
+    return
+  })
+})
+
+app.post('/divRRecords', (req, res) => {
+  const ID = req.body.recordID
+
+  connection.getConnection((err, connection) => {
+    if (err) {
+      console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
+    } else {
+      connection.query(
+        'SELECT TipoDivisãoPistas FROM divisaopistasocorrencia WHERE Ocorrencia = ?',
+        [ID],
+        (error, results) => {
+          res.send(results)
+        }
+      )
+    }
+    if (connection) connection.release()
+    return
+  })
+})
+
+app.post('/vegRecords', (req, res) => {
+  const ID = req.body.recordID
+
+  connection.getConnection((err, connection) => {
+    if (err) {
+      console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
+    } else {
+      connection.query(
+        'SELECT VegetacaoEntorno FROM vegetacaoentornoocorrencia WHERE Ocorrencia = ?',
+        [ID],
+        (error, results) => {
+          res.send(results)
+        }
+      )
+    }
+    if (connection) connection.release()
+    return
+  })
+})
+
+app.post('/myRecords', (req, res) => {
+  const user = req.body.user
+
+  connection.getConnection((err, connection) => {
+    if (err) {
+      console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
+    } else {
+      connection.query(
+        'SELECT o.CodOcorrencia, o.Especie, e.NomeComum, o.NomeComumNaoCadastrado, o.NomeCientificoNaoCadastrado, o.GrupoTaxonomico, o.NumeroIndividuos, o.Foto1, o.Foto2, o.Foto3, o.Sexo, o.CondicaoAnimal, o.AnimalVivo, o.Causa, o.InstituicaoDepositaria, o.Endereco, o.AnimalEmUC, o.Sentido, o.Km, o.TipoVia, o.TipoPavimento, o.NumPistas, o.NumFaixas, o.VelocidadeMax, o.Intervencao, o.DescrIntervencao, o.Vazamento, o.DescrVazamento, o.EncontradoEm, o.CondicaoTempo, o.LagoRioRiacho, o.Observacoes, o.STATUS, o.DataRegistro, o.HoraRegistro FROM ocorrencia AS o LEFT JOIN especie AS e ON o.Especie = e.CodEspecie WHERE usuario = ? ORDER BY o.CodOcorrencia DESC',
+        [user],
+        (error, results) => {
+          res.send(results)
+        }
+      )
+    }
+    if (connection) connection.release()
+    return
+  })
+})
+
+app.post('/upload', (req, res) => {
+  const id = req.body.id
+  const destinacao = req.body.destinacao
+  const status = req.body.status
+
+  connection.getConnection((err, connection) => {
+    if (err) {
+      console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
+    } else {
+      connection.query(
+        'DELETE FROM destinoanimalocorrencia WHERE Ocorrencia = ?',
+        [id],
+        (error, results) => {
+          if (destinacao.length > 0) {
+            destinacao.map((CodDest) => {
+              connection.query(
+                'INSERT INTO destinoanimalocorrencia (Ocorrencia, DestinoAnimal) VALUES (?, ?)',
+                [id, CodDest],
+                (err, response) => {
+                  if (err) {
+                    console.log(err)
+                  }
+                }
+              )
+            })
+          }
+          connection.query(
+            'UPDATE ocorrencia SET STATUS = ? WHERE CodOcorrencia = ?',
+            [status, id],
+            (err, response) => {
+              res.send()
+              if (err) {
+                console.log(err)
+              }
+            }
+          )
+        }
+      )
+    }
+    if (connection) connection.release()
+    return
+  })
+})
 
 // Iniciando o servidor.
 app.listen(3000, () => {

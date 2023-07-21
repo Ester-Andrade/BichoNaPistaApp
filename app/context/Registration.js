@@ -17,6 +17,7 @@ export const RegistrationProvider = ({ children }) => {
     city,
     street,
     user,
+    animalName,
     setAlertMsg,
     setShowAlert,
     setSendingData
@@ -32,11 +33,20 @@ export const RegistrationProvider = ({ children }) => {
       if (registrationQueue == null) {
         AsyncStorage.setItem(
           'registrationQueue',
-          JSON.stringify([[occurrence, dateTime, city, street, user]])
+          JSON.stringify([
+            [occurrence, dateTime, city, street, user, animalName],
+          ])
         )
       } else {
         registrationQueue = JSON.parse(registrationQueue)
-        registrationQueue.push([occurrence, dateTime, city, street, user])
+        registrationQueue.push([
+          occurrence,
+          dateTime,
+          city,
+          street,
+          user,
+          animalName,
+        ])
         AsyncStorage.setItem(
           'registrationQueue',
           JSON.stringify(registrationQueue)
@@ -167,6 +177,87 @@ export const RegistrationProvider = ({ children }) => {
     )
   }
 
+  const uploadAttempt = async (
+    ID,
+    destination,
+    status,
+    setAlertMsg,
+    setShowAlert,
+    setSendingData
+  ) => {
+    const newStatus = destination.includes(1) ? status : status.split(' e ')[0]
+    if (isConnected) {
+      setSendingData(true)
+      await upload(ID, destination, newStatus)
+      setSendingData(false)
+      setAlertMsg('Registro atualizado com sucesso!')
+      setShowAlert(true)
+    } else {
+      let uploadQueue = await AsyncStorage.getItem('uploadQueue')
+      if (uploadQueue == null) {
+        AsyncStorage.setItem(
+          'uploadQueue',
+          JSON.stringify([[ID, destination, newStatus]])
+        )
+      } else {
+        uploadQueue = JSON.parse(uploadQueue)
+        uploadQueue.push([ID, destination, newStatus])
+        AsyncStorage.setItem('uploadQueue', JSON.stringify(uploadQueue))
+      }
+      setAlertMsg(
+        'Você está sem conexão à internet! \n\nSeu registro será atualizado assim que a conexão for restaurada, ou da próxima vez que abrir o app com conexão.'
+      )
+      setShowAlert(true)
+    }
+  }
+
+  const upload = async (ID, destination, status) => {
+    try {
+      await fetch('http://' + PcIP + ':3000/upload', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: ID,
+          destinacao: destination,
+          status: status,
+        }),
+        headers: {
+          'Content-type': 'application/json',
+        },
+      })
+        .then((response) => response.json())
+        .then((body) => {
+          console.log(body)
+        })
+    } catch (e) {
+      console.log(
+        'Ocorreu um erro ao se conectar ao servidor, tente novamente mais tarde. \n\n Erro: '+ e
+      )
+    }
+  }
+
+  const uploadLocalData = async (
+    ID,
+    destination,
+    setAlertMsg,
+    setShowAlert,
+    setSendingData
+  ) => {
+    setSendingData(true)
+    let registrationQueue = await AsyncStorage.getItem('registrationQueue')
+    registrationQueue = JSON.parse(registrationQueue)
+    registrationQueue.map(async (registration, i) => {
+      if (i == ID) {
+        registration[0].destinacao = destination
+      }
+    })
+    AsyncStorage.setItem('registrationQueue', JSON.stringify(registrationQueue))
+    setSendingData(false)
+    setAlertMsg(
+      'Você alterou um registro que está aguardando conexão para ser enviado! \n\nEle será enviado com a alteração realizada assim que a conexão for restaurada.'
+    )
+    setShowAlert(true)
+  }
+
   useEffect(() => {
     ;(async () => {
       if (isConnected) {
@@ -187,12 +278,23 @@ export const RegistrationProvider = ({ children }) => {
           )
           AsyncStorage.removeItem('registrationQueue')
         }
+
+        let uploadQueue = await AsyncStorage.getItem('uploadQueue')
+        if (uploadQueue != null) {
+          uploadQueue = JSON.parse(uploadQueue)
+          uploadQueue.map(
+            async (item) => await upload(item[0], item[1], item[2])
+          )
+          AsyncStorage.removeItem('uploadQueue')
+        }
       }
     })()
   }, [isConnected])
 
   return (
-    <RegistrationContext.Provider value={{ sendAttempt, send }}>
+    <RegistrationContext.Provider
+      value={{ sendAttempt, send, uploadAttempt, uploadLocalData }}
+    >
       {children}
     </RegistrationContext.Provider>
   )
