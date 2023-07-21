@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect, useCallback, useRef } from 'react'
+import { useIsFocused } from '@react-navigation/native'
 import {
   View,
   Text,
@@ -6,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Alert,
+  ActivityIndicator,
 } from 'react-native'
 import { LinearGradient } from 'expo-linear-gradient'
 import {
@@ -34,6 +36,7 @@ import Animated, {
 } from 'react-native-reanimated'
 import CustomHeader from '../../components/CustomHeader'
 import NoConnection from '../../components/NoConnection'
+import getData from './HomeScreenContainer'
 import images from '../../config/images'
 import colors from '../../config/styles'
 import styles from './styles'
@@ -52,7 +55,10 @@ const initialRegion = {
 const HomeScreen = ({ navigation }) => {
   const [region, setRegion] = useState()
 
-  const isConnected = useIsConnected()
+  const [gettingData, setGettingData] = useState(true)
+  const [data, setData] = useState(null)
+
+  const flatListRef = useRef(null)
 
   const getCurrentPosition = async () => {
     let { status } = await Location.requestForegroundPermissionsAsync()
@@ -75,20 +81,22 @@ const HomeScreen = ({ navigation }) => {
     } catch (e) {}
   }
 
-  useEffect(() => {
-    getCurrentPosition()
-  }, [])
+  const isFocused = useIsFocused()
+  const isConnected = useIsConnected()
 
-  const data = [
-    '#FF6633',
-    '#FFB399',
-    '#FF33FF',
-    '#FFFF99',
-    '#00B3E6',
-    '#E6B333',
-    '#99FF99',
-    '#B34D4D',
-  ]
+  useEffect(() => {
+    ;(async () => {
+      if (isConnected && isFocused) {
+        await getData(setData)
+
+        getCurrentPosition()
+
+        setGettingData(false)
+      } else if (!isConnected) {
+        setGettingData(false)
+      }
+    })()
+  }, [isFocused, isConnected])
 
   const translateY = useSharedValue(0)
 
@@ -140,7 +148,23 @@ const HomeScreen = ({ navigation }) => {
           style={styles.map}
           region={region}
           initialRegion={initialRegion}
-        ></MapView>
+          showsUserLocation={true}
+        >
+          {data != null
+            ? data.map((roadkill, i) => {
+                return (
+                  <Marker
+                    key={i}
+                    coordinate={{
+                      latitude: roadkill.Latitude,
+                      longitude: roadkill.Longitude,
+                    }}
+                    onPress={() => flatListRef.current?.scrollToIndex({index: i, Animated:true, viewOffset: WIDTH*0.915})}
+                  />
+                )
+              })
+            : null}
+        </MapView>
         <GestureDetector gesture={gesture}>
           <Animated.View style={[styles.bottomContainer, rBottomSheetStyle]}>
             <View style={styles.latestRecords}>
@@ -153,76 +177,119 @@ const HomeScreen = ({ navigation }) => {
               >
                 ULTIMOS REGISTROS
               </Text>
-              <FlatList
-                data={data}
-                keyExtractor={(item) => String(item)}
-                showsHorizontalScrollIndicator={false}
-                snapToOffsets={[...Array(data.length)].map(
-                  (x, i) => i * (WIDTH * 0.8 - 15) + (i - 1) * 30
-                )}
-                horizontal
-                snapToAlignment={'start'}
-                scrollEventThrottle={16}
-                decelerationRate="fast"
-                renderItem={({ item }) => (
-                  <View style={styles.latestRecordsItem}>
-                    <View style={styles.photo}></View>
-                    <View style={styles.info}>
-                      <Text
-                        style={[
-                          styles.title,
-                          { fontFamily: 'SourceSansPro_700Bold_Italic' },
-                        ]}
-                      >
-                        Capivara
-                      </Text>
-                      <Text
-                        numberOfLines={1}
-                        style={[
-                          styles.text,
-                          { fontFamily: 'SourceSansPro_400Regular_Italic' },
-                        ]}
-                      >
-                        Hydrochoerus hydrochaeris
-                      </Text>
-                      <View style={styles.line}>
-                        <Text
-                          style={[
-                            styles.text,
-                            { fontFamily: 'SourceSansPro_400Regular_Italic' },
-                          ]}
-                        >
-                          05/08/2021
-                        </Text>
-                        <Text
-                          style={[
-                            styles.text,
-                            { fontFamily: 'SourceSansPro_400Regular_Italic' },
-                          ]}
-                        >
-                          10:30
-                        </Text>
+              {gettingData ? (
+                <View
+                  style={{
+                    flex: 1,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                  }}
+                >
+                  <ActivityIndicator size={'small'} color={colors.yellow} />
+                </View>
+              ) : data === null ? (
+                <Image
+                  source={images.icons.noConnection}
+                  style={styles.watermark2}
+                />
+              ) : (
+                <FlatList
+                  ref={flatListRef}
+                  initialScrollIndex={0}
+                  data={data}
+                  keyExtractor={(item) => String(item.CodOcorrencia)}
+                  showsHorizontalScrollIndicator={false}
+                  snapToOffsets={[...Array(data.length)].map(
+                    (x, i) => i * (WIDTH * 0.8 - 15) + (i - 1) * 30
+                  )}
+                  horizontal
+                  snapToAlignment={'start'}
+                  scrollEventThrottle={16}
+                  decelerationRate="fast"
+                  renderItem={({ item }) => (
+                    <View style={styles.latestRecordsItem}>
+                      <View style={styles.photo}>
+                        <Image
+                          source={{ uri: item.Foto1 }}
+                          style={styles.photoImage}
+                        />
                       </View>
-                      <Text
-                        style={[
-                          styles.text,
-                          { fontFamily: 'SourceSansPro_400Regular_Italic' },
-                        ]}
-                      >
-                        Mamífero
-                      </Text>
-                      <Text
-                        style={[
-                          styles.text,
-                          { fontFamily: 'SourceSansPro_400Regular_Italic' },
-                        ]}
-                      >
-                        Vivo
-                      </Text>
+                      <View style={styles.info}>
+                        {(item.NomeComum || item.NomeComumNaoCadastrado) && (
+                          <Text
+                            style={[
+                              styles.title,
+                              { fontFamily: 'SourceSansPro_700Bold_Italic' },
+                            ]}
+                          >
+                            {item.NomeComum != null
+                              ? item.NomeComum
+                              : item.NomeComumNaoCadastrado}
+                          </Text>
+                        )}
+                        {(item.NomeCientifico ||
+                          item.NomeCientificoNaoCadastrado) && (
+                          <Text
+                            numberOfLines={1}
+                            style={[
+                              styles.text,
+                              { fontFamily: 'SourceSansPro_400Regular_Italic' },
+                            ]}
+                          >
+                            {item.NomeCientifico != null
+                              ? item.NomeCientifico
+                              : item.NomeCientificoNaoCadastrado}
+                          </Text>
+                        )}
+                        <View style={styles.line}>
+                          <Text
+                            style={[
+                              styles.text,
+                              { fontFamily: 'SourceSansPro_400Regular_Italic' },
+                            ]}
+                          >
+                            {item.DataRegistro.split('T')[0].split('-')[2] +
+                              '/' +
+                              item.DataRegistro.split('T')[0].split('-')[1] +
+                              '/' +
+                              item.DataRegistro.split('T')[0].split('-')[0]}
+                          </Text>
+                          <Text
+                            style={[
+                              styles.text,
+                              { fontFamily: 'SourceSansPro_400Regular_Italic' },
+                            ]}
+                          >
+                            {item.HoraRegistro.split(':')[0] +
+                              ':' +
+                              item.HoraRegistro.split(':')[1]}
+                          </Text>
+                        </View>
+                        {item.NomeGrupoTax && (
+                          <Text
+                            style={[
+                              styles.text,
+                              { fontFamily: 'SourceSansPro_400Regular_Italic' },
+                            ]}
+                          >
+                            {item.NomeGrupoTax}
+                          </Text>
+                        )}
+                        {item.CondicaoAnimal && (
+                          <Text
+                            style={[
+                              styles.text,
+                              { fontFamily: 'SourceSansPro_400Regular_Italic' },
+                            ]}
+                          >
+                            {item.CondicaoAnimal}
+                          </Text>
+                        )}
+                      </View>
                     </View>
-                  </View>
-                )}
-              />
+                  )}
+                />
+              )}
             </View>
             <TouchableOpacity
               activeOpacity={0.6}

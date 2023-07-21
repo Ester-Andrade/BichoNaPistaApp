@@ -531,7 +531,40 @@ app.post('/rankingPosition', (req, res) => {
   })
 })
 
-//ultmos registro
+app.get('/lastrecords', function (req, res) {
+  connection.getConnection((err, connection) => {
+    if (err) {
+      console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
+    } else {
+      connection.query(
+        'SELECT o.CodOcorrencia, o.Foto1, e.NomeComum, e.NomeCientifico, o.NomeComumNaoCadastrado, o.NomeCientificoNaoCadastrado, o.DataRegistro, o.HoraRegistro, g.NomeGrupoTax, o.CondicaoAnimal, o.Latitude, o.Longitude from ocorrencia AS o LEFT JOIN especie AS e ON o.Especie = e.CodEspecie LEFT JOIN grupotaxonomico AS g ON o.GrupoTaxonomico = g.CodGrupoTax ORDER BY o.CodOcorrencia DESC LIMIT 20',
+        (error, results) => {
+          res.send(results)
+        }
+      )
+    }
+    if (connection) connection.release()
+    return
+  })
+})
+
+app.post('/getPhoto', (req, res) => {
+  const photoName = req.body.photoName
+
+  var s3 = new AWS.S3({
+    accessKeyId: s3key.accessKeyID,
+    secretAccessKey: s3key.secretAccessKey,
+    region: 'sa-east-1',
+  })
+
+  var params = {
+    Bucket: 'bicho-na-pista-bucket',
+    Key: 'images/' + photoName,
+  }
+  s3.getSignedUrl('getObject', params, function (err, url) {
+    res.send({ link: url })
+  })
+})
 
 //Meus regstros
 

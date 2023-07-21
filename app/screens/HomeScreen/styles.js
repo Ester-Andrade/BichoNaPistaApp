@@ -89,8 +89,14 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 6,
     borderColor: 	colors.gray3,
-    opacity: 0.45,
+    opacity: 0.85,
     // elevation: 2,
+  },
+  photoImage: {
+    width:'100%',
+    height:'100%',
+    opacity: 1,
+    //elevation: 2,
   },
   info: {
     flex: 1,
@@ -107,6 +113,18 @@ const styles = StyleSheet.create({
   line: {
     flexDirection: 'row',
     justifyContent: 'space-between'
+  },
+  watermark2: {
+    alignSelf: 'center',
+    marginTop: '9%',
+    height: '29%',
+    opacity: 0.11,
+    resizeMode: 'contain',
+  },
+  pin: {
+    height: 40,
+    width: 20,
+    resizeMode: 'contain'
   }
 })
 
