@@ -149,6 +149,7 @@ const HomeScreen = ({ navigation }) => {
           region={region}
           initialRegion={initialRegion}
           showsUserLocation={true}
+          toolbarEnabled={false}
         >
           {data != null
             ? data.map((roadkill, i) => {
