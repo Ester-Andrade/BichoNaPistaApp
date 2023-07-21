@@ -111,11 +111,11 @@ const ComplementDestinationScreen = ({ navigation }) => {
                             { fontFamily: 'SourceSansPro_400Regular_Italic' },
                           ]}
                         >
-                          {item[1].getDate() +
+                          {('00' + item[1].getDate()).slice(-2) +
                             '/' +
-                            (item[1].getMonth() + 1) +
+                            ('00' + (item[1].getMonth() + 1)).slice(-2) +
                             '/' +
-                            item[1].getFullYear()}
+                            ('00' + item[1].getFullYear()).slice(-2)}
                         </Text>
                         <Text
                           style={[
@@ -123,7 +123,7 @@ const ComplementDestinationScreen = ({ navigation }) => {
                             { fontFamily: 'SourceSansPro_400Regular_Italic' },
                           ]}
                         >
-                          {item[1].getHours() + ':' + item[1].getMinutes()}
+                          {('00' + item[1].getHours()).slice(-2) + ':' + ('00' + item[1].getMinutes()).slice(-2)}
                         </Text>
                       </View>
                       <Text
@@ -132,7 +132,7 @@ const ComplementDestinationScreen = ({ navigation }) => {
                           { fontFamily: 'SourceSansPro_400Regular_Italic' },
                         ]}
                       >
-                        {item[0].condicao_animal}
+                        {item[0].condicao_animal == null ? '' : item[0].condicao_animal}
                       </Text>
                       <Text
                         style={[
@@ -140,7 +140,7 @@ const ComplementDestinationScreen = ({ navigation }) => {
                           { fontFamily: 'SourceSansPro_400Regular_Italic' },
                         ]}
                       >
-                        {item[0].local}
+                        {item[0].local == null ? '' : item[0].local}
                       </Text>
                     </View>
                   </View>
@@ -187,7 +187,7 @@ const ComplementDestinationScreen = ({ navigation }) => {
                             ? ''
                             : String(item[0].velocidade_max_permitida),
                         sentido_da_via: item[0].sentido_da_via,
-                        km: item[0].km == null ? '' : String(reg.Km),
+                        km: item[0].km == null ? '' : String(item[0].km),
                         tipo_de_via: item[0].tipo_de_via,
                         n_faixas:
                           item[0].n_faixas == null

@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   CardHeader: {
     width: '100%',
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
   },
   CardInfo: {
     flexDirection: 'row',
@@ -34,13 +34,13 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderRadius: 6,
     borderColor: colors.gray3,
-    opacity: 0.45,
+    opacity: 0.85,
   },
   info: {
     flex: 1,
     alignSelf: 'center',
     marginLeft: Dimensions.get('screen').width * 0.06,
-    marginRight: Dimensions.get('screen').width * 0.03
+    marginRight: Dimensions.get('screen').width * 0.03,
   },
   title: {
     alignSelf: 'flex-start',
@@ -52,7 +52,7 @@ const styles = StyleSheet.create({
   clockIcon: {
     alignSelf: 'center',
     height: 13 * scale,
-    width: 11 * scale
+    width: 11 * scale,
   },
   text: {
     fontSize: 14 * scale,
@@ -65,6 +65,27 @@ const styles = StyleSheet.create({
   line: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+  },
+  watermark2: {
+    alignSelf: 'center',
+    marginTop: '60%',
+    height: Dimensions.get('screen').width * 0.45,
+    opacity: 0.11,
+    resizeMode: 'contain',
+  },
+  noRegsText: {
+    alignSelf: 'center',
+    width: Dimensions.get('screen').width * 0.7,
+    marginTop: Dimensions.get('screen').height * 0.37,
+    fontSize: 15 * scale,
+    color: colors.gray4,
+    textAlign: 'center',
+  },
+  photoImage: {
+    width: '100%',
+    height: '100%',
+    opacity: 1,
+    //elevation: 2,
   },
 })
 
