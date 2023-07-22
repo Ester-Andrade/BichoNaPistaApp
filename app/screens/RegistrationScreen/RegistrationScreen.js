@@ -177,17 +177,22 @@ const RegistrationScreen = ({ navigation, route }) => {
             latitude: latitude,
             longitude: longitude,
           })
-          setInitPlace([
-            place[0].subregion,
-            place[0].street,
-            place[0].street +
-              ' - ' +
-              place[0].district +
-              ', ' +
-              place[0].subregion +
-              ' - ' +
-              place[0].region,
-          ])
+
+          if (place.length > 0) {
+            setInitPlace([
+              place[0].subregion,
+              place[0].street,
+              place[0].street +
+                ' - ' +
+                place[0].district +
+                ', ' +
+                place[0].subregion +
+                ' - ' +
+                place[0].region,
+            ])
+          } else {
+            setInitPlace(['', '', ''])
+          }
         } catch (error) {
           console.warn('alou3')
           setInitPlace(['', '', ''])
@@ -335,7 +340,9 @@ const RegistrationScreen = ({ navigation, route }) => {
                   this.myScroll = ref
                   this.myScroll?.scrollTo({
                     x: 0,
-                    y: route.params.editable ? 0 : Dimensions.get('screen').height,
+                    y: route.params.editable
+                      ? 0
+                      : Dimensions.get('screen').height,
                     animated: true,
                   })
                 }}
@@ -424,17 +431,23 @@ const RegistrationScreen = ({ navigation, route }) => {
                             latitude: latitude,
                             longitude: longitude,
                           })
-                          setFieldValue(
-                            'local',
-                            place[0].street +
-                              ' - ' +
-                              place[0].district +
-                              ', ' +
-                              place[0].subregion +
-                              ' - ' +
-                              place[0].region
-                          )
-                          setInitPlace([place[0].subregion, place[0].street])
+
+                          if (place.length > 0) {
+                            setFieldValue(
+                              'local',
+                              place[0].street +
+                                ' - ' +
+                                place[0].district +
+                                ', ' +
+                                place[0].subregion +
+                                ' - ' +
+                                place[0].region
+                            )
+                            setInitPlace([place[0].subregion, place[0].street])
+                          } else {
+                            setFieldValue('local', '')
+                            setInitPlace(['', ''])
+                          }
                         } catch (error) {}
                       })()
                     }}

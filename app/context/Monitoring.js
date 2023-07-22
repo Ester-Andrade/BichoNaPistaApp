@@ -44,15 +44,20 @@ export const MonitoringProvider = ({ children }) => {
         latitude: latitude,
         longitude: longitude,
       })
-      setInitialPlace(
-        place[0].street +
-          ' - ' +
-          place[0].district +
-          ', ' +
-          place[0].subregion +
-          ' - ' +
-          place[0].region
-      )
+
+      if (place.length > 0) {
+        setInitialPlace(
+          place[0].street +
+            ' - ' +
+            place[0].district +
+            ', ' +
+            place[0].subregion +
+            ' - ' +
+            place[0].region
+        )
+      } else {
+        setInitialPlace('Latitude: ' + latitude + ', Longitude: ' + longitude)
+      }
 
       setInitialDateTime(new Date())
       setInMonitoring(true)
@@ -78,15 +83,20 @@ export const MonitoringProvider = ({ children }) => {
         latitude: latitude,
         longitude: longitude,
       })
-      setFinalPlace(
-        place[0].street +
-          ' - ' +
-          place[0].district +
-          ', ' +
-          place[0].subregion +
-          ' - ' +
-          place[0].region
-      )
+
+      if (place.length > 0) {
+        setFinalPlace(
+          place[0].street +
+            ' - ' +
+            place[0].district +
+            ', ' +
+            place[0].subregion +
+            ' - ' +
+            place[0].region
+        )
+      } else {
+        setFinalPlace('Latitude: ' + latitude + ', Longitude: ' + longitude)
+      }
 
       setFinalDateTime(new Date())
       setInMonitoring(false)

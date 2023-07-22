@@ -86,13 +86,13 @@ const HomeScreen = ({ navigation }) => {
 
   useEffect(() => {
     ;(async () => {
-      if (isConnected && isFocused) {
+      try {
         await getData(setData)
 
         getCurrentPosition()
 
-        setGettingData(false)
-      } else if (!isConnected) {
+        setGettingData(false)        
+      } catch (error) {
         setGettingData(false)
       }
     })()
