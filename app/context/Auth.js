@@ -92,15 +92,6 @@ export const AuthProvider = ({ children }) => {
       setUserName(userName)
       let userType = await AsyncStorage.getItem('userType')
       setUserType(JSON.parse(userType))
-      if (isConnected) {
-        getProfileInfo(userType, userToken)
-      } else {
-        let rankPosi = await AsyncStorage.getItem('rankPos')
-        setRankPos(JSON.parse(rankPosi))
-        let nRegis = await AsyncStorage.getItem('nRegs')
-        setNregs(JSON.parse(nRegis))
-      }
-      setIsLoading(false)
     } catch (e) {
       console.log('isLogged in error ', e)
     }
@@ -110,9 +101,34 @@ export const AuthProvider = ({ children }) => {
     isLoggedIn()
   }, [])
 
+  useEffect(() => {
+    ;(async () => {
+      if (isConnected) {
+        getProfileInfo(userType, userToken)
+      } else {
+        let rankPosi = await AsyncStorage.getItem('rankPos')
+        setRankPos(JSON.parse(rankPosi))
+        let nRegis = await AsyncStorage.getItem('nRegs')
+        setNregs(JSON.parse(nRegis))
+      }
+      setIsLoading(false)
+    })()
+  }, [isConnected])
+
   return (
     <AuthContext.Provider
-      value={{ isLoading, userToken, userName, userType, rankPos, setRankPos, nRegs, setNregs, logIn, logOut }}
+      value={{
+        isLoading,
+        userToken,
+        userName,
+        userType,
+        rankPos,
+        setRankPos,
+        nRegs,
+        setNregs,
+        logIn,
+        logOut,
+      }}
     >
       {children}
     </AuthContext.Provider>

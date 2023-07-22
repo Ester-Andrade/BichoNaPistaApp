@@ -160,7 +160,12 @@ const HomeScreen = ({ navigation }) => {
                       latitude: roadkill.Latitude,
                       longitude: roadkill.Longitude,
                     }}
-                    onPress={() => flatListRef.current?.scrollToIndex({index: i, Animated:true, viewOffset: WIDTH*0.915})}
+                    onPress={() =>
+                      flatListRef.current?.scrollToIndex({
+                        index: i,
+                        Animated: true,
+                      })
+                    }
                   />
                 )
               })
@@ -197,6 +202,11 @@ const HomeScreen = ({ navigation }) => {
                 <FlatList
                   ref={flatListRef}
                   initialScrollIndex={0}
+                  getItemLayout={(data, index) => ({
+                    length: WIDTH * 0.8,
+                    offset: index * (WIDTH * 0.8 - 15) + (index - 1) * 30,
+                    index,
+                  })}
                   data={data}
                   keyExtractor={(item) => String(item.CodOcorrencia)}
                   showsHorizontalScrollIndicator={false}

@@ -6,6 +6,7 @@ import {
   Image,
   ActivityIndicator,
   TouchableOpacity,
+  Dimensions,
 } from 'react-native'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
@@ -279,7 +280,9 @@ const RegistrationScreen = ({ navigation, route }) => {
                     initPlace[0],
                     initPlace[1],
                     userToken,
-                    especieOp[values.especie].NomeComum,
+                    values.especie == null
+                      ? values.nome_comum_nao_cadastrado
+                      : especieOp[values.especie].NomeComum,
                     setAlertMsg,
                     setShowAlert,
                     setSendingData
@@ -328,6 +331,14 @@ const RegistrationScreen = ({ navigation, route }) => {
               />
             ) : (
               <ScrollView
+                ref={(ref) => {
+                  this.myScroll = ref
+                  this.myScroll?.scrollTo({
+                    x: 0,
+                    y: route.params.editable ? 0 : Dimensions.get('screen').height,
+                    animated: true,
+                  })
+                }}
                 nestedScrollEnabled={true}
                 style={styles.root}
                 contentContainerStyle={{ alignItems: 'center', flexGrow: 1 }}

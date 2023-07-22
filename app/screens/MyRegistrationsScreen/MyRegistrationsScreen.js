@@ -200,7 +200,7 @@ const MyRegistrationsScreen = ({ navigation }) => {
                         n_pistas:
                           item[0].n_pistas == null
                             ? ''
-                            : String(item[0].tipo_de_divisao),
+                            : String(item[0].n_pistas),
                         tipo_de_divisao: item[0].tipo_de_divisao,
                         tipo_de_pavimento: item[0].tipo_de_pavimento,
                         trecho_com_intervencao: item[0].trecho_com_intervencao,
@@ -371,7 +371,7 @@ const MyRegistrationsScreen = ({ navigation }) => {
                             n_faixas:
                               reg.NumFaixas == null ? '' : String(reg.NumFaixas),
                             n_pistas:
-                              reg.NumFaixas == null ? '' : String(reg.NumFaixas),
+                              reg.NumPistas == null ? '' : String(reg.NumPistas),
                             tipo_de_divisao: reg.divPista,
                             tipo_de_pavimento: reg.TipoPavimento,
                             trecho_com_intervencao: reg.Intervencao,
