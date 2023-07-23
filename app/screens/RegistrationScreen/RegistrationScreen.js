@@ -162,14 +162,12 @@ const RegistrationScreen = ({ navigation, route }) => {
         setEncontradoEmOp
       )
       if (route.params.editable) {
-        console.warn('alou')
         try {
           const {
             coords: { latitude, longitude },
           } = await Location.getCurrentPositionAsync({
             enableHighAccuracy: true,
           })
-          console.warn('alou2')
           setInitLatitude(latitude)
           setInitLongitude(longitude)
 
@@ -194,7 +192,6 @@ const RegistrationScreen = ({ navigation, route }) => {
             setInitPlace(['', '', ''])
           }
         } catch (error) {
-          console.warn('alou3')
           setInitPlace(['', '', ''])
           setAlertMsg(
             'Não é possível prosseguir sem a localização! \n\nVerifique se o GPS está ligado.'

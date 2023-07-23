@@ -6,7 +6,10 @@
     "orientation": "portrait",
     "assetBundlePatterns": [
       "**/*"
-    ]
+    ],
+    "android": {
+      "package": "com.anonymous.BichoNaPistaApp"
+    }
   },
   "name": "BichoNaPistaApp"
 }
