@@ -103,7 +103,7 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     ;(async () => {
-      if (isConnected) {
+      if (isConnected && userToken != null) {
         getProfileInfo(userType, userToken)
       } else {
         let rankPosi = await AsyncStorage.getItem('rankPos')

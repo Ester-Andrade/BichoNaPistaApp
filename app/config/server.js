@@ -70,28 +70,35 @@ app.post('/login', (req, res) => {
   const passwordHash = hash.hex()
   const email = req.body.email
 
-  connection.getConnection((err, connection) => {
-    if (err) {
-      console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
-    } else {
-      connection.query(
-        'SELECT CodUsuario, NomeCompleto, Perfil FROM usuario WHERE Email = ? AND Senha = ?',
-        [email, passwordHash],
-        (err, result) => {
-          if (err) {
-            res.send(err)
+  if (req.body.password == '') {
+    res.send({ loginFail: true, msg: 'Email ou senha incorreta !'})
+  } else {
+    connection.getConnection((err, connection) => {
+      if (err) {
+        console.log(
+          'Ocorreu um erro ao tentar se conectar ao banco! Erro: ',
+          err
+        )
+      } else {
+        connection.query(
+          'SELECT CodUsuario, NomeCompleto, Perfil FROM usuario WHERE Email = ? AND Senha = ?',
+          [email, passwordHash],
+          (err, result) => {
+            if (err) {
+              res.send(err)
+            }
+            if (result.length > 0) {
+              res.send({ loginFail: false, result })
+            } else {
+              res.send({ loginFail: true, msg: 'Email ou senha incorreta !' })
+            }
           }
-          if (result.length > 0) {
-            res.send({ loginFail: false, result })
-          } else {
-            res.send({ loginFail: true, msg: 'Email ou senha incorreta !' })
-          }
-        }
-      )
-    }
-    if (connection) connection.release()
-    return
-  })
+        )
+      }
+      if (connection) connection.release()
+      return
+    })
+  }
 })
 
 app.get('/grupoTax', function (req, res) {
