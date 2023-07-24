@@ -2,8 +2,10 @@ const express = require('express')
 const cors = require('cors')
 const mysql = require('mysql')
 var sha256 = require('js-sha256')
+var nodemailer = require('nodemailer')
 var AWS = require('aws-sdk')
 const s3key = require('./S3Keys')
+const myEmail = require('./emailCredentials')
 
 // Database connection
 const connection = mysql.createPool({
@@ -71,7 +73,7 @@ app.post('/login', (req, res) => {
   const email = req.body.email
 
   if (req.body.password == '') {
-    res.send({ loginFail: true, msg: 'Email ou senha incorreta !'})
+    res.send({ loginFail: true, msg: 'Email ou senha incorreta !' })
   } else {
     connection.getConnection((err, connection) => {
       if (err) {
@@ -100,6 +102,60 @@ app.post('/login', (req, res) => {
     })
   }
 })
+
+app.post('/sendMail', (req, res) => {
+  const email = req.body.email
+
+  connection.getConnection((err, connection) => {
+    if (err) {
+      console.log('Ocorreu um erro ao tentar se conectar ao banco! Erro: ', err)
+    } else {
+      connection.query(
+        'SELECT NomeCompleto FROM usuario WHERE Email = ?',
+        [email],
+        (err, result) => {
+          if (err) {
+            res.send(err)
+          }
+          if (result.length > 0) {
+            const nome = result[0].NomeCompleto.split(' ')
+
+            var transporter = nodemailer.createTransport({
+              service: 'Gmail',
+              auth: {
+                user: myEmail.email,
+                pass: myEmail.password,
+              },
+            })
+
+            transporter.sendMail({
+              from: 'noreply@bichonapista.com',
+              to: email,
+              subject: 'Password Reset',
+              html: '<html> <head> <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0"> <title>email</title> </head> <body> <div style="width: 100%; height: 100%; position: relative; background: #EDEDED; border-radius: 10px; overflow: hidden"> <div style="width: 759px; height: 425px; margin-left: 25%; margin-top: 3cm; margin-bottom: 5cm; padding-top: 40px; position: relative; background: white; border-radius: 20px"> <div style="margin-left: 5%; margin-bottom: 0px; position: relative; color: #262626; font-size: 22px; font-family: Source Sans Pro; font-weight: 400; word-wrap: break-word">Olá ' + nome[0] + ' ' + nome[nome.length - 1] + ',</div> <div style="margin-left: 5%; margin-bottom: 20px; position: relative; color: #8C8C8C; font-size: 22px; font-family: Source Sans Pro; font-weight: 400; word-wrap: break-word">Aqui está as instruções para redefinir sua senha.</div> <div style="width: 713px; height: 0px; margin-left: 23px; margin-bottom: 16px; position: relative; border: 0.50px #C4C4C4 solid"></div> <div style="width: 669px; margin-left: 5%; margin-bottom: 46px; position: relative; text-align: justify; color: #404040; font-size: 20px; font-family: Source Sans Pro; font-weight: 400; word-wrap: break-word">Foi realizada uma requisição para redefinir sua senha do app BichoNaPista. Se você não fez essa solicitação, ignore esse email. Se você fez essa solicitação, por favor redefina sua senha: </div> <a href="http://localhost:3000/resetPassword"> <button type="button" style="border:none; width: 185px; height: 52px; margin-left: 287px; margin-bottom: 46px; position: relative; background: #FFDE3B; border-radius: 5px"> <div style="left: 37px; top: 16px; color: #404040; font-size: 16px; font-family: Source Sans Pro; font-weight: 700; word-wrap: break-word">Redefinir senha</div> </button> </a> <div style="margin-left: 5%; margin-bottom: 0px; position: relative; color: #404040; font-size: 20px; font-family: Source Sans Pro; font-weight: 400; word-wrap: break-word">Atenciosamente,</div> <div style="margin-left: 5%; margin-bottom: 3cm; position: relative; color: #404040; font-size: 20px; font-family: Source Sans Pro; font-weight: 400; word-wrap: break-word">Time BichoNaPista</div> </div> </div> </body> </html>'
+            })
+
+            res.send({
+              msg:
+                'Um link para que possa redefinir sua senha foi enviado para o email: \n\n' +
+                email,
+            })
+          } else {
+            res.send({
+              msg:
+                'Não foi encontrado nenhuma conta com o endereço \n\n' + email,
+            })
+          }
+        }
+      )
+    }
+    if (connection) connection.release()
+    return
+  })
+})
+
+//example page to reset password
+app.use('/resetPassword', express.static('../emailPage'))
 
 app.get('/grupoTax', function (req, res) {
   connection.getConnection((err, connection) => {

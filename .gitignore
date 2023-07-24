@@ -57,3 +57,4 @@ dist/
 # My PC Ip file
 /app/config/MyPcIp.js
 /app/config/S3Keys.js
+/app/config/emailCredentials.js

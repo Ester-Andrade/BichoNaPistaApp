@@ -10,6 +10,7 @@ import { Formik } from 'formik'
 import * as Yup from 'yup'
 import CustomTextInput from '../../components/CustomTextInput'
 import CustomButton from '../../components/CustomButton'
+import sendMail from './ForgotPasswordViewContainer'
 import images from '../../config/images'
 import styles from './styles'
 
@@ -43,12 +44,7 @@ const ForgotPasswordView = ({ ViewIsOpen, setShowAlert, setAlertMsg }) => {
       validationSchema={RecoverSchema}
       onSubmit={(value) => {
         if (isConnected) {
-          setAlertMsg(
-            'Um email para recuperação de senha foi enviado para o email: ' +
-              value.email
-          )
-          ViewIsOpen(false)
-          setShowAlert(true)
+          sendMail(value.email, setAlertMsg, setShowAlert, ViewIsOpen)
         } else {
           setAlertMsg('Você está sem conexão à internet')
           ViewIsOpen(false)
