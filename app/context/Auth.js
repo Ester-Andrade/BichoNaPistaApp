@@ -1,8 +1,6 @@
 import React, { createContext, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
-import * as Facebook from 'expo-auth-session/providers/facebook'
-import * as WebBrowser from 'expo-web-browser'
 import { useIsConnected } from 'react-native-offline'
 import PcIP from '../config/MyPcIp'
 
