@@ -1,5 +1,8 @@
 import React, { createContext, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
+import * as Facebook from 'expo-auth-session/providers/facebook'
+import * as WebBrowser from 'expo-web-browser'
 import { useIsConnected } from 'react-native-offline'
 import PcIP from '../config/MyPcIp'
 
@@ -47,6 +50,55 @@ export const AuthProvider = ({ children }) => {
       })
     setIsLoading(false)
   }
+
+  const googleLogin = async () => {
+    GoogleSignin.configure({
+      webClientId:
+        '965764258884-5ru1c3ppju7bt2k3b5dem72q34seoo90.apps.googleusercontent.com',
+    })
+
+    try {
+      await GoogleSignin.hasPlayServices()
+      const userInfo = await GoogleSignin.signIn()
+      await GoogleSignin.signOut()
+
+      setIsLoading(true)
+
+      fetch('http://' + PcIP + ':3000/socialLogin', {
+        method: 'POST',
+        body: JSON.stringify({
+          email: userInfo.user.email,
+          name: userInfo.user.name,
+        }),
+        headers: {
+          'Content-type': 'application/json',
+        },
+      })
+        .then((response) => response.json())
+        .then((body) => {
+          let userInfo = body
+          let name = userInfo.NomeCompleto
+          name = name.split(' ')
+          name = name[0] + ' ' + name[name.length - 1]
+          setUserToken(userInfo.CodUsuario)
+          setUserName(name)
+          setUserType(userInfo.Perfil)
+          AsyncStorage.setItem(
+            'userToken',
+            JSON.stringify(userInfo.CodUsuario)
+          )
+          AsyncStorage.setItem('userName', name)
+          AsyncStorage.setItem('userType', JSON.stringify(userInfo.Perfil))
+          getProfileInfo(userInfo.Perfil, userInfo.CodUsuario)
+        })
+
+      setIsLoading(false)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const facebookLogin = async () => {}
 
   const getProfileInfo = (type, token) => {
     fetch('http://' + PcIP + ':3000/rankingPosition', {
@@ -128,6 +180,8 @@ export const AuthProvider = ({ children }) => {
         setNregs,
         logIn,
         logOut,
+        googleLogin,
+        facebookLogin,
       }}
     >
       {children}

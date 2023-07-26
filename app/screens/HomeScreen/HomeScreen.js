@@ -89,14 +89,28 @@ const HomeScreen = ({ navigation }) => {
       try {
         await getData(setData)
 
-        getCurrentPosition()
-
+        if (isFocused) {
+          getCurrentPosition()
+        }
+        
         setGettingData(false)        
       } catch (error) {
         setGettingData(false)
       }
     })()
-  }, [isFocused, isConnected])
+  }, [isFocused])
+
+  useEffect(() => {
+    ;(async () => {
+      try {
+        await getData(setData)
+        
+        setGettingData(false)        
+      } catch (error) {
+        setGettingData(false)
+      }
+    })()
+  }, [isConnected])
 
   const translateY = useSharedValue(0)
 

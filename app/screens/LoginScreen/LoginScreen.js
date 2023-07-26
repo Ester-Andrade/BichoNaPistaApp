@@ -29,7 +29,7 @@ const LoginScreen = () => {
   const [alertMsg, setAlertMsg] = useState(true)
   const [loginFail, setLoginFail] = useState(false)
 
-  const { logIn } = useContext(AuthContext)
+  const { logIn, googleLogin, facebookLogin } = useContext(AuthContext)
 
   const isConnected = useIsConnected()
 
@@ -50,18 +50,18 @@ const LoginScreen = () => {
     setRegisterIsOpen(true)
   }
 
-  const onGoogleLoginPressed = () => {
+  const onGoogleLoginPressed = async () => {
     if (isConnected) {
-      console.warn('Google login pressed')
+      googleLogin()
     } else {
       setAlertMsg('Você está sem conexão à internet')
       setShowAlert(true)
     }
   }
 
-  const onFacebookLoginPressed = () => {
+  const onFacebookLoginPressed = async () => {
     if (isConnected) {
-      console.warn('Facebook login pressed')
+      facebookLogin()
     } else {
       setAlertMsg('Você está sem conexão à internet')
       setShowAlert(true)

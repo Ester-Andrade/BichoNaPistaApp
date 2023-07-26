@@ -61,6 +61,11 @@ export const MonitoringProvider = ({ children }) => {
 
       setInitialDateTime(new Date())
       setInMonitoring(true)
+
+      setAlertMsg(
+        'Monitoramento iniciado! \n\nCuidado, fechar o aplicativo encerrará o monitoramento.'
+      )
+      setShowAlert(true)
     } catch (error) {
       setAlertMsg(
         'Não é possível prosseguir sem a localização! \n\nVerifique se o GPS está ligado.'

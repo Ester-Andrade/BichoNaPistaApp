@@ -4,12 +4,15 @@
     "slug": "BichoNaPistaApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "android": {
-      "package": "com.anonymous.BichoNaPistaApp"
-    }
+      "package": "com.anonymous.BichoNaPistaApp",
+      "googleServicesFile": "./android/app/google-services.json"
+    },
+    "scheme": [
+      "com.anonymous.BichoNaPistaApp"
+    ],
+    "plugins": ["@react-native-google-signin/google-signin"]
   },
   "name": "BichoNaPistaApp"
 }

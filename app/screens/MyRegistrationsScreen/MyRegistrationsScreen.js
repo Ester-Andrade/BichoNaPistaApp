@@ -21,7 +21,7 @@ const MyRegistrationsScreen = ({ navigation }) => {
   const isConnected = useIsConnected()
   const isFocused = useIsFocused()
 
-  const { userToken } = useContext(AuthContext)
+  const { userToken, userType } = useContext(AuthContext)
 
   const [gettingData, setGettingData] = useState(true)
   const [data, setData] = useState(null)
@@ -95,10 +95,10 @@ const MyRegistrationsScreen = ({ navigation }) => {
                 </View>
                 <View style={styles.CardInfo}>
                   <View style={styles.photo}>
-                  <Image
-                        source={{ uri: item[0].photo1 }}
-                        style={styles.photoImage}
-                      />
+                    <Image
+                      source={{ uri: item[0].photo1 }}
+                      style={styles.photoImage}
+                    />
                   </View>
                   <View style={styles.info}>
                     <View style={styles.line}>
@@ -109,10 +109,10 @@ const MyRegistrationsScreen = ({ navigation }) => {
                         ]}
                       >
                         {('00' + item[1].getDate()).slice(-2) +
-                            '/' +
-                            ('00' + (item[1].getMonth() + 1)).slice(-2) +
-                            '/' +
-                            ('00' + item[1].getFullYear()).slice(-2)}
+                          '/' +
+                          ('00' + (item[1].getMonth() + 1)).slice(-2) +
+                          '/' +
+                          ('00' + item[1].getFullYear()).slice(-2)}
                       </Text>
                       <Text
                         style={[
@@ -120,7 +120,9 @@ const MyRegistrationsScreen = ({ navigation }) => {
                           { fontFamily: 'SourceSansPro_400Regular_Italic' },
                         ]}
                       >
-                        {('00' + item[1].getHours()).slice(-2) + ':' + ('00' + item[1].getMinutes()).slice(-2)}
+                        {('00' + item[1].getHours()).slice(-2) +
+                          ':' +
+                          ('00' + item[1].getMinutes()).slice(-2)}
                       </Text>
                     </View>
                     <Text
@@ -129,7 +131,9 @@ const MyRegistrationsScreen = ({ navigation }) => {
                         { fontFamily: 'SourceSansPro_400Regular_Italic' },
                       ]}
                     >
-                      {item[0].condicao_animal == null ? '' : item[0].condicao_animal}
+                      {item[0].condicao_animal == null
+                        ? ''
+                        : item[0].condicao_animal}
                     </Text>
                     <Text
                       style={[
@@ -139,7 +143,7 @@ const MyRegistrationsScreen = ({ navigation }) => {
                     >
                       Status: aguardando rede
                     </Text>
-                    {item[0].destinacao.includes(1) ? (
+                    {item[0].destinacao.includes(1) && userType == 1 ? (
                       <View style={styles.line}>
                         <Text
                           style={[
@@ -154,77 +158,83 @@ const MyRegistrationsScreen = ({ navigation }) => {
                           size={12}
                           type="editar"
                           onPress={() =>
-                      navigation.navigate('Registro', {
-                        editable: false,
-                        id: i,
-                        offData: true,
-                        photo1: item[0].photo1,
-                        photo2: item[0].photo2,
-                        photo3: item[0].photo3,
-                        local:
-                          item[0].local == null ? '' : String(item[0].local),
-                        grupo_taxonomico: item[0].grupo_taxonomico,
-                        n_individuos:
-                          item[0].n_individuos == null
-                            ? ''
-                            : String(item[0].n_individuos),
-                        //Animal data
-                        especie: item[0].especie,
-                        nome_comum_nao_cadastrado:
-                          item[0].nome_comum_nao_cadastrado == null
-                            ? ''
-                            : String(item[0].nome_comum_nao_cadastrado),
-                        nome_cientifico_nao_cadastrado:
-                          item[0].nome_cientifico_nao_cadastrado == null
-                            ? ''
-                            : String(item[0].nome_cientifico_nao_cadastrado),
-                        sexo: item[0].sexo,
-                        condicao_animal: item[0].condicao_animal,
-                        causa: item[0].causa,
-                        animal_vivo: item[0].animal_vivo,
-                        destinacao: item[0].destinacao,
-                        instituicao_depositaria:
-                          item[0].instituicao_depositaria,
-                        //road data
-                        velocidade_max_permitida:
-                          item[0].velocidade_max_permitida == null
-                            ? ''
-                            : String(item[0].velocidade_max_permitida),
-                        sentido_da_via: item[0].sentido_da_via,
-                        km: item[0].km == null ? '' : String(item[0].km),
-                        tipo_de_via: item[0].tipo_de_via,
-                        n_faixas:
-                          item[0].n_faixas == null
-                            ? ''
-                            : String(item[0].n_faixas),
-                        n_pistas:
-                          item[0].n_pistas == null
-                            ? ''
-                            : String(item[0].n_pistas),
-                        tipo_de_divisao: item[0].tipo_de_divisao,
-                        tipo_de_pavimento: item[0].tipo_de_pavimento,
-                        trecho_com_intervencao: item[0].trecho_com_intervencao,
-                        descr_intervencao:
-                          item[0].descr_intervencao == null
-                            ? ''
-                            : String(item[0].descr_intervencao),
-                        vazamento_na_pista: item[0].vazamento_na_pista,
-                        descr_vazamento:
-                          item[0].descr_vazamento == null
-                            ? ''
-                            : String(item[0].descr_vazamento),
-                        //surroundings conditions
-                        condicoes_do_tempo: item[0].condicoes_do_tempo,
-                        lago_rio_riacho: item[0].lago_rio_riacho,
-                        vegetacao_entorno: item[0].vegetacao_entorno,
-                        encontrado_em: item[0].encontrado_em,
-                        animal_em_uc: item[0].animal_em_uc,
-                        //observations
-                        observacoes:
-                          item[0].observacoes == null
-                            ? ''
-                            : String(item[0].observacoes),
-                      })}
+                            navigation.navigate('Registro', {
+                              editable: false,
+                              id: i,
+                              offData: true,
+                              photo1: item[0].photo1,
+                              photo2: item[0].photo2,
+                              photo3: item[0].photo3,
+                              local:
+                                item[0].local == null
+                                  ? ''
+                                  : String(item[0].local),
+                              grupo_taxonomico: item[0].grupo_taxonomico,
+                              n_individuos:
+                                item[0].n_individuos == null
+                                  ? ''
+                                  : String(item[0].n_individuos),
+                              //Animal data
+                              especie: item[0].especie,
+                              nome_comum_nao_cadastrado:
+                                item[0].nome_comum_nao_cadastrado == null
+                                  ? ''
+                                  : String(item[0].nome_comum_nao_cadastrado),
+                              nome_cientifico_nao_cadastrado:
+                                item[0].nome_cientifico_nao_cadastrado == null
+                                  ? ''
+                                  : String(
+                                      item[0].nome_cientifico_nao_cadastrado
+                                    ),
+                              sexo: item[0].sexo,
+                              condicao_animal: item[0].condicao_animal,
+                              causa: item[0].causa,
+                              animal_vivo: item[0].animal_vivo,
+                              destinacao: item[0].destinacao,
+                              instituicao_depositaria:
+                                item[0].instituicao_depositaria,
+                              //road data
+                              velocidade_max_permitida:
+                                item[0].velocidade_max_permitida == null
+                                  ? ''
+                                  : String(item[0].velocidade_max_permitida),
+                              sentido_da_via: item[0].sentido_da_via,
+                              km: item[0].km == null ? '' : String(item[0].km),
+                              tipo_de_via: item[0].tipo_de_via,
+                              n_faixas:
+                                item[0].n_faixas == null
+                                  ? ''
+                                  : String(item[0].n_faixas),
+                              n_pistas:
+                                item[0].n_pistas == null
+                                  ? ''
+                                  : String(item[0].n_pistas),
+                              tipo_de_divisao: item[0].tipo_de_divisao,
+                              tipo_de_pavimento: item[0].tipo_de_pavimento,
+                              trecho_com_intervencao:
+                                item[0].trecho_com_intervencao,
+                              descr_intervencao:
+                                item[0].descr_intervencao == null
+                                  ? ''
+                                  : String(item[0].descr_intervencao),
+                              vazamento_na_pista: item[0].vazamento_na_pista,
+                              descr_vazamento:
+                                item[0].descr_vazamento == null
+                                  ? ''
+                                  : String(item[0].descr_vazamento),
+                              //surroundings conditions
+                              condicoes_do_tempo: item[0].condicoes_do_tempo,
+                              lago_rio_riacho: item[0].lago_rio_riacho,
+                              vegetacao_entorno: item[0].vegetacao_entorno,
+                              encontrado_em: item[0].encontrado_em,
+                              animal_em_uc: item[0].animal_em_uc,
+                              //observations
+                              observacoes:
+                                item[0].observacoes == null
+                                  ? ''
+                                  : String(item[0].observacoes),
+                            })
+                          }
                         />
                       </View>
                     ) : null}
@@ -316,7 +326,7 @@ const MyRegistrationsScreen = ({ navigation }) => {
                   >
                     Status: {reg.STATUS.split(' e ')[0]}
                   </Text>
-                  {reg.destinacao.includes(1) ? (
+                  {reg.destinacao.includes(1) && userType == 1 ? (
                     <View style={styles.line}>
                       <Text
                         style={[
@@ -338,7 +348,8 @@ const MyRegistrationsScreen = ({ navigation }) => {
                             photo1: reg.Foto1,
                             photo2: reg.Foto2,
                             photo3: reg.Foto3,
-                            local: reg.Endereco == null ? '' : String(reg.Endereco),
+                            local:
+                              reg.Endereco == null ? '' : String(reg.Endereco),
                             grupo_taxonomico: reg.GrupoTaxonomico,
                             n_individuos:
                               reg.NumeroIndividuos == null
@@ -369,9 +380,13 @@ const MyRegistrationsScreen = ({ navigation }) => {
                             km: reg.Km == null ? '' : String(reg.Km),
                             tipo_de_via: reg.TipoVia,
                             n_faixas:
-                              reg.NumFaixas == null ? '' : String(reg.NumFaixas),
+                              reg.NumFaixas == null
+                                ? ''
+                                : String(reg.NumFaixas),
                             n_pistas:
-                              reg.NumPistas == null ? '' : String(reg.NumPistas),
+                              reg.NumPistas == null
+                                ? ''
+                                : String(reg.NumPistas),
                             tipo_de_divisao: reg.divPista,
                             tipo_de_pavimento: reg.TipoPavimento,
                             trecho_com_intervencao: reg.Intervencao,
@@ -392,9 +407,12 @@ const MyRegistrationsScreen = ({ navigation }) => {
                             animal_em_uc: reg.AnimalEmUC,
                             //observations
                             observacoes:
-                              reg.Observacoes == null ? '' : String(reg.Observacoes),
+                              reg.Observacoes == null
+                                ? ''
+                                : String(reg.Observacoes),
                             oStatus: reg.STATUS,
-                          })}
+                          })
+                        }
                       />
                     </View>
                   ) : null}

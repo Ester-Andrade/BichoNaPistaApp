@@ -333,7 +333,7 @@ const MonitoringScreen = ({ navigation }) => {
         msg={alertMsg}
         showAlert={showAlert}
         setShowAlert={setShowAlert}
-        onPress={() => navigation.goBack()}
+        onPress={() => inMonitoring ? setShowAlert(false) : navigation.goBack()}
       />
       {isConnected ? null : <NoConnection />}
     </View>
