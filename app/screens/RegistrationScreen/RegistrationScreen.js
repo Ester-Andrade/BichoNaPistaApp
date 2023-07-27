@@ -334,7 +334,7 @@ const RegistrationScreen = ({ navigation, route }) => {
             ) : (
               <ScrollView
                 ref={(ref) => {
-                  if (route.params.editable) {
+                  if (!route.params.editable) {
                     this.myScroll = ref
                     this.myScroll?.scrollTo({
                       x: 0,
