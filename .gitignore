@@ -58,3 +58,4 @@ dist/
 /app/config/MyPcIp.js
 /app/config/S3Keys.js
 /app/config/emailCredentials.js
+/android/app/google-services.json

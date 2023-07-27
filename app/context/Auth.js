@@ -1,8 +1,12 @@
 import React, { createContext, useEffect, useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
+import * as Facebook from 'expo-auth-session/providers/facebook'
+import * as WebBrowser from 'expo-web-browser'
 import { useIsConnected } from 'react-native-offline'
 import PcIP from '../config/MyPcIp'
+
+WebBrowser.maybeCompleteAuthSession()
 
 export const AuthContext = createContext()
 
@@ -13,6 +17,11 @@ export const AuthProvider = ({ children }) => {
   const [userType, setUserType] = useState(null)
   const [rankPos, setRankPos] = useState(null)
   const [nRegs, setNregs] = useState(null)
+
+  //facebook login
+  const [request, response, promptAsync] = Facebook.useAuthRequest({
+    clientId: '1208005653201016',
+  })
 
   const isConnected = useIsConnected()
 
@@ -81,10 +90,7 @@ export const AuthProvider = ({ children }) => {
           setUserToken(userInfo.CodUsuario)
           setUserName(name)
           setUserType(userInfo.Perfil)
-          AsyncStorage.setItem(
-            'userToken',
-            JSON.stringify(userInfo.CodUsuario)
-          )
+          AsyncStorage.setItem('userToken', JSON.stringify(userInfo.CodUsuario))
           AsyncStorage.setItem('userName', name)
           AsyncStorage.setItem('userType', JSON.stringify(userInfo.Perfil))
           getProfileInfo(userInfo.Perfil, userInfo.CodUsuario)
@@ -96,7 +102,13 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
-  const facebookLogin = async () => {}
+  const facebookLogin = async () => {
+    const result = await promptAsync()
+    if (result.type !== 'success') {
+      console.log('Algo deu errado !')
+      return
+    }
+  }
 
   const getProfileInfo = (type, token) => {
     fetch('http://' + PcIP + ':3000/rankingPosition', {
@@ -164,6 +176,18 @@ export const AuthProvider = ({ children }) => {
       setIsLoading(false)
     })()
   }, [isConnected])
+
+  useEffect(() => {
+    if (response && response.type === 'success' && response.authentication) {
+      ;(async () => {
+        const userInfoResponse = await fetch(
+          'https://graph.facebook.com/me?access_token=${response.authetication.accessToken}&fields=id,name'
+        )
+        const userInfo = await userInfoResponse.json()
+        console.log(userInfo)
+      })()
+    }
+  }, [response])
 
   return (
     <AuthContext.Provider

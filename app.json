@@ -10,7 +10,7 @@
       "googleServicesFile": "./android/app/google-services.json"
     },
     "scheme": [
-      "com.anonymous.BichoNaPistaApp"
+      "com.anonymous.BichoNaPistaApp","fb1208005653201016"
     ],
     "plugins": ["@react-native-google-signin/google-signin"]
   },

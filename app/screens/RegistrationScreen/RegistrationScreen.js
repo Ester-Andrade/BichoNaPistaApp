@@ -139,7 +139,6 @@ const RegistrationScreen = ({ navigation, route }) => {
   const [wPhoto, setWPhoto] = useState(null)
   const [showAlert, setShowAlert] = useState(false)
   const [alertMsg, setAlertMsg] = useState(true)
-  const [scrollPos, setScrollPos] = useState(0)
 
   // ======================= Occurrence position ======================
   const [initLatitude, setInitLatitude] = useState(null)
@@ -335,16 +334,15 @@ const RegistrationScreen = ({ navigation, route }) => {
             ) : (
               <ScrollView
                 ref={(ref) => {
-                  this.myScroll = ref
-                  this.myScroll?.scrollTo({
-                    x: 0,
-                    y: route.params.editable
-                      ? scrollPos
-                      : Dimensions.get('screen').height,
-                    animated: true,
-                  })
+                  if (route.params.editable) {
+                    this.myScroll = ref
+                    this.myScroll?.scrollTo({
+                      x: 0,
+                      y: Dimensions.get('screen').height,
+                      animated: true,
+                    })
+                  }
                 }}
-                onMomentumScrollEnd={event => { setScrollPos(event.nativeEvent.contentOffset.y)}}
                 nestedScrollEnabled={true}
                 style={styles.root}
                 contentContainerStyle={{ alignItems: 'center', flexGrow: 1 }}
